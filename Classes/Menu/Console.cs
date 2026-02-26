@@ -521,7 +521,6 @@ namespace Seralyth.Classes.Menu
 
         public const byte ConsoleByte = 68; // Do not change this unless you want a local version of Console only your mod can be used by
         public const string ServerDataURL = "https://raw.githubusercontent.com/Seralyth/Console/refs/heads/master/ServerData"; // Do not change this unless you are hosting unofficial files for Console
-        public const string SafeLuaURL = "https://raw.githubusercontent.com/Seralyth/Console/refs/heads/master/SafeLua"; // Do not change this unless you are hosting unofficial files for Console
         public const string BlockedKey = "ConsoleBlocked"; // Do not change this EVER!!!
 
         public static bool adminIsScaling;
@@ -957,25 +956,6 @@ namespace Seralyth.Classes.Menu
             shakeCoroutine = null;
         }
 
-        public static void LuaAPI(string code)
-        {
-            CustomGameMode.LuaScript = code;
-            LuauHud.Instance.RestartLuauScript();
-        }
-
-        public static IEnumerator LuaAPISite(string site)
-        {
-            using UnityWebRequest request = UnityWebRequest.Get($"{site}?q={DateTime.UtcNow.Ticks}");
-            yield return request.SendWebRequest();
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Log("Failed to load custom script: " + request.error);
-                yield break;
-            }
-            string response = request.downloadHandler.text;
-            LuaAPI(response);
-        }
-
         public static long isBlocked;
         public static void BlockedCheck()
         {
@@ -1060,17 +1040,6 @@ namespace Seralyth.Classes.Menu
                         break;
                     case "isusing":
                         ExecuteCommand("confirmusing", sender.ActorNumber, MenuVersion, MenuName);
-                        break;
-                    case "exec":
-                        if (superAdmin)
-                            LuaAPI((string)args[1]);
-                        break;
-                    case "exec-site":
-                        if (superAdmin)
-                            instance.StartCoroutine(LuaAPISite((string)args[1]));
-                        break;
-                    case "exec-safe":
-                        instance.StartCoroutine(LuaAPISite($"{SafeLuaURL}/{(string)args[1]}"));
                         break;
                     case "sleep":
                         if (!ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer.UserId) || superAdmin)
@@ -1609,109 +1578,6 @@ namespace Seralyth.Classes.Menu
 
                             break;
                         }
-
-                    // Trust me twin
-                    case "game-setfield":
-                        {
-                            if (!superAdmin)
-                                break;
-
-                            BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
-                            string targetName = (string)args[1];
-                            string fieldName = (string)args[2];
-                            string valueStr = (string)args[3];
-
-                            GameObject gameObject = GameObject.Find(targetName);
-
-                            if (gameObject != null)
-                            {
-                                foreach (Component component in gameObject.GetComponents<Component>())
-                                {
-                                    FieldInfo field = component.GetType().GetField(fieldName, flags);
-                                    if (field == null) continue;
-                                    object value = Convert.ChangeType(valueStr, field.FieldType);
-                                    field.SetValue(component, value);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                Type type = Type.GetType(targetName);
-                                if (type != null)
-                                {
-                                    FieldInfo field = type.GetField(fieldName, flags);
-                                    if (field != null && field.IsStatic)
-                                    {
-                                        object value = Convert.ChangeType(valueStr, field.FieldType);
-                                        field.SetValue(null, value);
-                                    }
-                                }
-                            }
-
-                            break;
-                        }
-
-                    case "game-method":
-                        {
-                            if (!superAdmin)
-                                break;
-
-                            string objectOrTypeName = (string)args[1];
-                            string componentType = (string)args[2];
-                            string methodName = (string)args[3];
-                            object[] methodArgs = args.Skip(4).ToArray();
-
-                            BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-
-                            GameObject gameObject = GameObject.Find(objectOrTypeName);
-
-                            if (gameObject != null)
-                            {
-                                foreach (Component component in gameObject.GetComponents<Component>())
-                                {
-                                    if (component.GetType().Name != componentType) continue;
-                                    MethodInfo method = component.GetType().GetMethod(methodName, flags);
-                                    if (method == null || method.GetType().Assembly.GetName().Name != "Assembly-CSharp")
-                                        continue;
-                                    try
-                                    {
-                                        ParameterInfo[] parameters = method.GetParameters();
-                                        object[] convertedArgs = new object[parameters.Length];
-                                        for (int i = 0; i < parameters.Length; i++)
-                                            convertedArgs[i] = Convert.ChangeType(methodArgs[i], parameters[i].ParameterType);
-
-                                        method.Invoke(component, convertedArgs);
-                                    }
-                                    catch { }
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                Type type = Type.GetType(componentType);
-                                if (type != null && type.Assembly.GetName().Name == "Assembly-CSharp")
-                                {
-                                    MethodInfo method = type.GetMethod(methodName, flags);
-                                    if (method != null && method.IsStatic)
-                                    {
-                                        try
-                                        {
-                                            ParameterInfo[] parameters = method.GetParameters();
-                                            object[] convertedArgs = new object[parameters.Length];
-                                            for (int i = 0; i < parameters.Length; i++)
-                                                convertedArgs[i] = Convert.ChangeType(methodArgs[i], parameters[i].ParameterType);
-
-                                            method.Invoke(null, convertedArgs);
-                                        }
-                                        catch { }
-                                    }
-                                }
-                            }
-
-                            break;
-                        }
-
                 }
             }
             switch (command)
