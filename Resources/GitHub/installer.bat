@@ -9,9 +9,10 @@ cls
 title Seralyth Menu Installer // [#---------] Getting directory
 color 0e
 
+:: Thanks to tdcvoid for telling me the new path for Oculus
 set steamPath1="C:/Program Files (x86)/Steam/steamapps/common/Gorilla Tag"
 set steamPath2="D:/SteamLibrary/steamapps/common/Gorilla Tag"
-set steamPath3="C:/Program Files/Oculus/Software/Software/another-axiom-gorilla-tag"
+set steamPath3="C:/Program Files/Meta Horizon/Software/Software/another-axiom-gorilla-tag" 
 set steamPath4="D:/Steam/steamapps/common/Gorilla Tag"
 
 if exist %steamPath1% (
