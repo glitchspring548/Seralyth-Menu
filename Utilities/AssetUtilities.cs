@@ -67,9 +67,9 @@ namespace Seralyth.Utilities
             AudioClip sound;
             if (!audioFilePool.TryGetValue(fileName, out var value))
             {
-                string filePath = Path.GetFullPath(fileName).Replace("\\", "/");
+                string filePath = $"{GetGamePath()}/{PluginInfo.BaseDirectory}/{fileName}";
 
-                UnityWebRequest actualrequest = UnityWebRequestMultimedia.GetAudioClip($"file://{filePath}", GetAudioType(GetFileExtension(filePath)));
+                UnityWebRequest actualrequest = UnityWebRequestMultimedia.GetAudioClip($"file://{filePath}", GetAudioType(GetFileExtension(fileName)));
                 UnityWebRequestAsyncOperation newvar = actualrequest.SendWebRequest();
                 while (!newvar.isDone) { }
 
