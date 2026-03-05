@@ -4258,29 +4258,16 @@ namespace Seralyth.Menu
 
             try
             {
-                MonkeAgent.instance.calls = 0;
-                MonkeAgent.instance.logErrorCount = 0;
-
-                MonkeAgent.instance.userRPCCalls.Clear();
-                MonkeAgent.instance.RefreshRPCs();
-
                 MonkeAgent.instance.rpcErrorMax = int.MaxValue;
                 MonkeAgent.instance.rpcCallLimit = int.MaxValue;
                 MonkeAgent.instance.logErrorMax = int.MaxValue;
-
+                MonkeAgent.instance.userRPCCalls.Clear();
+                
                 PhotonNetwork.MaxResendsBeforeDisconnect = int.MaxValue;
                 PhotonNetwork.QuickResends = int.MaxValue;
 
-                PhotonNetwork.NetworkingClient.LoadBalancingPeer.QuickResendAttempts = 0;
-                PhotonNetwork.NetworkingClient.LoadBalancingPeer.TrafficStatsReset();
-
                 PhotonNetwork.SendAllOutgoingCommands();
-                PhotonNetwork.NetworkingClient.LoadBalancingPeer.DispatchIncomingCommands();
-            }
-            catch
-            {
-                LogManager.Log("RPC protection failed, are you in a lobby?");
-            }
+            } catch { LogManager.Log("RPC protection failed, are you in a lobby?"); }
         }
 
 
