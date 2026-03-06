@@ -57,7 +57,7 @@ namespace Seralyth.Extensions
             int suspiciouslySteam = 0;
             int suspiciouslyPC = 0;
             int suspiciouslyQuest = 0;
-            string concatStringOfCosmeticsAllowed = rig.rawCosmeticString;
+            string concatStringOfCosmeticsAllowed = rig.Cosmetics();
 
             if (concatStringOfCosmeticsAllowed.Contains("S. FIRST LOGIN"))
                 suspiciouslySteam++;
@@ -107,7 +107,7 @@ namespace Seralyth.Extensions
         }
 
         public static bool Active(this VRRig rig) =>
-            rig != null && GorillaParent.instance.vrrigs.Contains(rig);
+            rig != null && VRRigCache.ActiveRigs.Contains(rig);
 
         public static float Distance(this VRRig rig, Vector3 position) =>
             Vector3.Distance(rig.transform.position, position);
@@ -119,7 +119,7 @@ namespace Seralyth.Extensions
             rig.Distance(GorillaTagger.Instance.bodyCollider.transform.position);
 
         public static VRRig GetClosest(this VRRig rig) =>
-            GorillaParent.instance.vrrigs.Where(targetRig => targetRig != null && targetRig != rig)
+            VRRigCache.ActiveRigs.Where(targetRig => targetRig != null && targetRig != rig)
                                          .OrderBy(rig.Distance)
                                          .FirstOrDefault();
 
@@ -191,5 +191,8 @@ namespace Seralyth.Extensions
 
         public static float GetSpeedMultiplier(this VRRig rig) =>
             rig.GetSpeed()[1];
+
+        public static string Cosmetics(this VRRig rig) =>
+            string.Concat(rig._playerOwnedCosmetics);
     }
 }

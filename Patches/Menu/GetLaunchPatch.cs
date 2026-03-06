@@ -42,7 +42,7 @@ namespace Seralyth.Patches.Menu
                     return;
 
                 List<NetPlayer> infected = InfectedList();
-                List<VRRig> rigs = GorillaParent.instance.vrrigs
+                List<VRRig> rigs = VRRigCache.ActiveRigs
                     .Where(rig => !rig.isLocal)
                     .Where(rig => !infected.Contains(GetPlayerFromVRRig(rig)))
                     .ToList();

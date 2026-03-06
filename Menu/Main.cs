@@ -4637,7 +4637,7 @@ namespace Seralyth.Menu
         {
             get
             {
-                if (!GorillaParent.instance.vrrigs.Contains(_giveGunTarget))
+                if (!VRRigCache.ActiveRigs.Contains(_giveGunTarget))
                     _giveGunTarget = null;
 
                 return _giveGunTarget;
@@ -5060,7 +5060,7 @@ namespace Seralyth.Menu
             var throwables = ((AllCosmeticsArraySO)CosmeticsController.instance.v2_allCosmeticsInfoAssetRef.Asset).sturdyAssetRefs.Where(x => x.obj != null && x.obj.info.isThrowable).Select(x => x.obj.info.playFabID).Distinct().ToList();
             if (snowballDict == null || snowballDict.Count != (throwables.Count - 3)) // lazy fix
             {
-                if (!CosmeticsV2Spawner_Dirty.completed)
+                if (!CosmeticsV2Spawner_Dirty.isPrepared)
                     return null;
 
                 if (!GorillaComputer.instance.isConnectedToMaster)
@@ -5868,7 +5868,7 @@ namespace Seralyth.Menu
             {
                 if (!GorillaComputer.instance.friendJoinCollider.playerIDsCurrentlyTouching.Contains(PhotonNetwork
                         .LocalPlayer.UserId) &&
-                    !CosmeticWardrobeProximityDetector.IsUserNearWardrobe(PhotonNetwork.LocalPlayer.UserId)) return;
+                    !CosmeticWardrobeProximityDetector.IsUserNearWardrobe(PhotonNetwork.LocalPlayer.ActorNumber)) return;
                 GorillaTagger.Instance.myVRRig.SendRPC("RPC_InitializeNoobMaterial", RpcTarget.All, VRRig.LocalRig.playerColor.r, VRRig.LocalRig.playerColor.g, VRRig.LocalRig.playerColor.b);
                 RPCProtection();
             }
