@@ -2091,7 +2091,7 @@ namespace Seralyth.Mods
                         macroStepDuration = defaultMacroStep
                     };
 
-                    string filePath = $"{PluginInfo.BaseDirectory}/Macros/{FormatMacroName(name)}.json";
+                    string filePath = Path.Combine(PluginInfo.BaseDirectory, "Macros", FormatMacroName(name) + ".json");
 
                     File.WriteAllText(filePath, macro.DumpJSON());
                     LoadMacros();
