@@ -6975,6 +6975,7 @@ namespace Seralyth.Mods
             }
         }
 
+        public static float setMasterDelay;
         public static void SetMasterClient(bool skip = false)
         {
             if (PhotonNetwork.IsMasterClient)
@@ -6985,7 +6986,11 @@ namespace Seralyth.Mods
                     NotificationManager.SendNotification($"<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> {PhotonNetwork.PlayerList.Length - 5} people must leave for this mod to work.");
                 return;
             }
-            PhotonNetwork.SetMasterClient(PhotonNetwork.LocalPlayer);
+            if (Time.time > setMasterDelay)
+            {
+                PhotonNetwork.SetMasterClient(PhotonNetwork.LocalPlayer);
+                setMasterDelay = Time.time + 5f;
+            }
         }
 
         public static void SetRoomStatus(bool status)
