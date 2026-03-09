@@ -2398,6 +2398,11 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Loop Sounds", enableMethod =() => Sound.LoopAudio = true, disableMethod =() => Sound.LoopAudio = false, toolTip = "Makes sounds loop forever until stopped."},
                 new ButtonInfo { buttonText = "Overlap Sounds", enableMethod =() => Sound.OverlapAudio = true, disableMethod =() => Sound.OverlapAudio = false, toolTip = "Makes it so you can play sounds over and over again, making them overlap eachother."},
                 new ButtonInfo { buttonText = "Sound Bindings", overlapText = "Sound Bindings <color=grey>[</color><color=green>None</color><color=grey>]</color>", method =() => Sound.SoundBindings(), enableMethod =() => Sound.SoundBindings(), disableMethod =() => Sound.SoundBindings(false), incremental = true, isTogglable = false, toolTip = "Changes the button used to play sounds on the soundboard."},
+                new ButtonInfo { buttonText = "Change Soundboard Volume", overlapText = "Change Soundboard Volume <color=grey>[</color><color=green>1</color><color=grey>]</color>", method =() => Fun.ChangeSoundboardVolume(), enableMethod =() => Fun.ChangeSoundboardVolume(), disableMethod =() => Fun.ChangeSoundboardVolume(false), incremental = true, isTogglable = false, toolTip = "Changes the volume of your sounds." },
+
+                new ButtonInfo { buttonText = "Change Soundboard Speed", overlapText = "Change Soundboard Speed <color=grey>[</color><color=green>1</color><color=grey>]</color>", method =() => Fun.ChangeSoundboardPitch(), enableMethod =() => Fun.ChangeSoundboardPitch(), disableMethod =() => Fun.ChangeSoundboardPitch(false), incremental = true, isTogglable = false, toolTip = "Changes the speed of your sounds" },
+                new ButtonInfo { buttonText = "Local Soundboard", enableMethod =() => Sound.localSoundboard = true, disableMethod =()=> Sound.localSoundboard = false, enabled = true, toolTip = "Decides if you should hear your own soundboards or not." },
+
             },
 
             new[] { // Overpowered Settings [31]
@@ -2469,10 +2474,6 @@ namespace Seralyth.Menu
 
             new[] { // Fun Settings [36]
                 new ButtonInfo { buttonText = "Exit Fun Settings", method =() => CurrentCategoryName = "Settings", isTogglable = false, toolTip = "Returns you back to the settings menu."},
-
-                new ButtonInfo { buttonText = "Change Soundboard Volume", overlapText = "Change Soundboard Volume <color=grey>[</color><color=green>1</color><color=grey>]</color>", method =() => Fun.ChangeSoundboardVolume(), enableMethod =() => Fun.ChangeSoundboardVolume(), disableMethod =() => Fun.ChangeSoundboardVolume(false), incremental = true, isTogglable = false, toolTip = "Changes the volume of your sounds." },
-
-                new ButtonInfo { buttonText = "Change Soundboard Speed", overlapText = "Change Soundboard Speed <color=grey>[</color><color=green>1</color><color=grey>]</color>", method =() => Fun.ChangeSoundboardPitch(), enableMethod =() => Fun.ChangeSoundboardPitch(), disableMethod =() => Fun.ChangeSoundboardPitch(false), incremental = true, isTogglable = false, toolTip = "Changes the speed of your sounds" },
 
                 new ButtonInfo { buttonText = "Change Head Spin Speed", overlapText = "Change Head Spin Speed <color=grey>[</color><color=green>0</color><color=grey>]</color>", method =() => Fun.ChangeHeadSpinSpeed(), enableMethod =() => Fun.ChangeHeadSpinSpeed(), disableMethod =() => Fun.ChangeHeadSpinSpeed(false), incremental = true, isTogglable = false, toolTip = "Changes the speed of the head spin mods." },
                 new ButtonInfo { buttonText = "Change Tinnitus Hertz", overlapText = "Change Tinnitus Hertz <color=grey>[</color><color=green>6000</color><color=grey>]</color>", method =() => Movement.ChangeTinnitusHz(), enableMethod =() => Movement.ChangeTinnitusHz(), disableMethod =() => Movement.ChangeTinnitusHz(false), incremental = true, isTogglable = false, toolTip = "Changes the target hertz for the tinnitus mods."},

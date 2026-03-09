@@ -287,6 +287,7 @@ namespace Seralyth.Mods
 
         private static GameObject soundboardAudioManager;
 
+        public static bool localSoundboard;
         public static void PlayAudio(AudioClip sound, bool disableMicrophone = false)
         {
             if (!PhotonNetwork.InRoom)
@@ -320,7 +321,6 @@ namespace Seralyth.Mods
                 NetworkSystem.Instance.VoiceConnection.PrimaryRecorder.RestartRecording(true);
             }
 
-            NetworkSystem.Instance.VoiceConnection.PrimaryRecorder.DebugEchoMode = true;
             if (!LoopAudio)
             {
                 AudioIsPlaying = true;

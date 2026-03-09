@@ -1967,11 +1967,13 @@ namespace Seralyth.Mods
 
             if (RecorderPatch.enabled)
             {
+                /*
                 if (VoiceManager.Get().SamplingRate != samplingRate)
                 {
                     VoiceManager.Get().SamplingRate = samplingRate; 
                     VoiceManager.Get().OutputRate = samplingRate;
                 }
+                */
                 
                 if (NetworkSystem.Instance.VoiceSettings.SamplingRate != (SamplingRate)samplingRate)
                     NetworkSystem.Instance.VoiceSettings.SamplingRate = (SamplingRate)samplingRate;
