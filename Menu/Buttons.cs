@@ -1575,7 +1575,7 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Set Name to \"BEHINDYOU\"", method =() => ChangeName("BEHINDYOU"), isTogglable = false, toolTip = "Sets your name to \"BEHINDYOU\"." },
                 new ButtonInfo { buttonText = "Set Name to \"iiOnTop\"", method =() => ChangeName("iiOnTop"), isTogglable = false, toolTip = "Sets your name to \"iiOnTop\"." },
 
-                new ButtonInfo { buttonText = "PBBV Name Cycle", method =() => Fun.NameCycle(new[] { "PPBV", "IS", "HERE" }), toolTip = "Sets your name on a loop to \"PBBV\", \"IS\", and \"HERE\"." },
+                new ButtonInfo { buttonText = "PBBV Name Cycle", method =() => Fun.NameCycle(new[] { "PBBV", "IS", "HERE" }), toolTip = "Sets your name on a loop to \"PBBV\", \"IS\", and \"HERE\"." },
                 new ButtonInfo { buttonText = "J3VU Name Cycle", method =() => Fun.NameCycle(new[] { "J3VU", "HAS", "BECOME", "HOSTILE" }), toolTip = "Sets your name on a loop to \"J3VU\", \"HAS\", \"BECOME\", and \"HOSTILE\"" },
                 new ButtonInfo { buttonText = "H1D3 Name Cycle", method =() => Fun.NameCycle(new[] { "H1D3", "HE", "HAS", "AWOKEN" }), toolTip = "Sets your name on a loop to \"H1D3\", \"HE\", \"HAS\", and \"AWOKEN\"" },
                 new ButtonInfo { buttonText = "No Escape Name Cycle", method =() => Fun.NameCycle(new[] { "THERE", "IS", "NO", "ESCAPE" }), toolTip = "Sets your name on a loop to \"THERE\", \"IS\", \"NO\", and \"ESCAPE\"" },
