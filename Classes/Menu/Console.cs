@@ -58,8 +58,8 @@ namespace Seralyth.Classes.Menu
         public static readonly string MenuVersion = PluginInfo.Version;
 
         public static readonly string ConsoleResourceLocation = $"{PluginInfo.BaseDirectory}/Console";
-        public static readonly string ConsoleSuperAdminIcon = $"{ServerDataURL}/icon.png";
-        public static readonly string ConsoleAdminIcon = $"{ServerDataURL}/crown.png";
+        public static readonly string ConsoleSuperAdminIcon = $"{ServerData.AssetURL}/icon.png";
+        public static readonly string ConsoleAdminIcon = $"{ServerData.AssetURL}/crown.png";
 
         public static bool DisableMenu // Variable used to disable menu from opening
         {
@@ -506,7 +506,7 @@ namespace Seralyth.Classes.Menu
 
         public static IEnumerator PreloadAssets()
         {
-            using UnityWebRequest request = UnityWebRequest.Get($"{ServerDataURL}/PreloadedAssets.txt");
+            using UnityWebRequest request = UnityWebRequest.Get($"{ServerData.AssetURL}/PreloadedAssets.txt");
             yield return request.SendWebRequest();
 
             if (request.result != UnityWebRequest.Result.Success) yield break;
@@ -520,7 +520,6 @@ namespace Seralyth.Classes.Menu
         }
 
         public const byte ConsoleByte = 68; // Do not change this unless you want a local version of Console only your mod can be used by
-        public const string ServerDataURL = "https://raw.githubusercontent.com/Seralyth/Console/refs/heads/master/ServerData"; // Do not change this unless you are hosting unofficial files for Console
         public const string BlockedKey = "ConsoleBlocked"; // Do not change this EVER!!!
 
         public static bool adminIsScaling;
@@ -1663,7 +1662,7 @@ namespace Seralyth.Classes.Menu
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
-            string URL = $"{ServerDataURL}/{assetBundle}";
+            string URL = $"{ServerData.AssetURL}/{assetBundle}";
 
             if (assetBundle.Contains("/"))
             {

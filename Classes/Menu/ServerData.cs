@@ -48,6 +48,10 @@ namespace Seralyth.Classes.Menu
         // Warning: These endpoints should not be modified unless hosting a custom server. Use with caution.
         public const string ServerEndpoint = "https://menu.seralyth.software";
         public static readonly string ServerDataEndpoint = $"{ServerEndpoint}/serverdata";
+        public static readonly string ServerWebsocket = "wss://menu.seralyth.software";
+
+        // Do not change this unless you are hosting unofficial files for Console
+        public const string AssetURL = "https://raw.githubusercontent.com/iiDk-the-actual/Console/refs/heads/master/ServerData";
 
         // The dictionary used to assign the admins only seen in your mod.
         public static readonly Dictionary<string, string> LocalAdmins = new Dictionary<string, string>()
