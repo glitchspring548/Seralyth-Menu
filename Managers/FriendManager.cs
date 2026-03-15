@@ -1334,7 +1334,7 @@ namespace Seralyth.Managers
 
         public class FriendWebSocket : MonoBehaviour
         {
-            public const string FriendWebsocket = "wss://menu.seralyth.software";
+            public readonly string FriendWebsocket = $"wss://menu.seralyth.software?mod={Classes.Menu.Console.MenuName}";
 
             public ClientWebSocket ws;
             public CancellationTokenSource cts;
@@ -1366,7 +1366,7 @@ namespace Seralyth.Managers
                 try
                 {
                     ws = new ClientWebSocket();
-                    await ws.ConnectAsync(new Uri(FriendWebsocket + $"?mod={Classes.Menu.Console.MenuName}"), cts.Token);
+                    await ws.ConnectAsync(new Uri(FriendWebsocket), cts.Token);
 
                     if (ws.State == WebSocketState.Open)
                     {
