@@ -37,7 +37,7 @@ namespace Seralyth.Managers
         private float gain = 1f;
         private float clipGain = 1f;
         private float pitch = 1f;
-        private float clipPitch;
+        private float clipPitch = 1f;
 
         private readonly int loopLength;
         private string currentDevice;
