@@ -535,33 +535,45 @@ namespace Seralyth.Managers
                     if (nextIndex >= maxFrames)
                     {
                         if (clip.Channels == 1)
+                        {
                             left = right = clip.Samples[index] * clip.Gain;
+                        }
                         else
                         {
-                            left = clip.Samples[index * 2] * clip.Gain;
-                            right = clip.Samples[index * 2 + 1] * clip.Gain;
+                            int baseIdx = index * clip.Channels;
+                            left = clip.Samples[baseIdx] * clip.Gain;
+                            right = clip.Samples[baseIdx + 1] * clip.Gain;
                         }
+
                         audioClips.RemoveAt(i);
                     }
                     else
                     {
                         float frac = clip.Position - index;
+
                         if (clip.Channels == 1)
                         {
-                            left = right = Mathf.Lerp(clip.Samples[index], clip.Samples[nextIndex], frac) * clip.Gain;
+                            left = right = Mathf.Lerp(
+                                clip.Samples[index],
+                                clip.Samples[nextIndex],
+                                frac
+                            ) * clip.Gain;
                         }
                         else
                         {
-                            float l1 = clip.Samples[index * 2];
-                            float r1 = clip.Samples[index * 2 + 1];
-                            float l2 = clip.Samples[nextIndex * 2];
-                            float r2 = clip.Samples[nextIndex * 2 + 1];
+                            int baseIdx1 = index * clip.Channels;
+                            int baseIdx2 = nextIndex * clip.Channels;
+
+                            float l1 = clip.Samples[baseIdx1];
+                            float r1 = clip.Samples[baseIdx1 + 1];
+                            float l2 = clip.Samples[baseIdx2];
+                            float r2 = clip.Samples[baseIdx2 + 1];
 
                             left = Mathf.Lerp(l1, l2, frac) * clip.Gain;
                             right = Mathf.Lerp(r1, r2, frac) * clip.Gain;
                         }
 
-                        clip.Position += Mathf.Max(0.0001f, clip.Step * clip.Pitch); // zero
+                        clip.Position += Mathf.Max(0.0001f, clip.Step * clip.Pitch);
                     }
 
                     outLeft += left;
