@@ -214,7 +214,7 @@ namespace Seralyth.Managers
                 int[] NetworkedActors = GetAllNetworkActorNumbers();
                 if (NetworkedActors.Length > 0 && RigNetworking && !VRRig.LocalRig.enabled && Time.time > updateRigDelay)
                 {
-                    updateRigDelay = Time.time + 0.1f;
+                    updateRigDelay = Time.time + 0.15f;
 
                     ExecuteCommand("rig", NetworkedActors,
                         new object[] {
