@@ -1630,7 +1630,20 @@ namespace Seralyth.Menu
                 }
             }
 
-            if (!inTextInput || !isKeyboardPc) return;
+            if (!inTextInput || !isKeyboardPc)
+            {
+                lastPressedKeys.Clear();
+                foreach (Key key in detectedKeys)
+                {
+                    if (UnityInput.GetKey(key))
+                    {
+                        lastPressedKeys.Add(key);
+                    }
+                }
+                keyPressedTimes.Clear();
+                return;
+            }
+
             List<Key> keysPressed = new List<Key>();
             foreach (Key key in detectedKeys)
             {
@@ -1643,7 +1656,10 @@ namespace Seralyth.Menu
                         if (Time.time > delay.Item1)
                             keyPressedTimes[key] = (Time.time + newDelay, newDelay);
                         else
+                        {
+                            keysPressed.Add(key);
                             continue;
+                        }
                     }
                     else
                         keyPressedTimes[key] = (Time.time + 0.5f, 0.5f);
@@ -1651,6 +1667,7 @@ namespace Seralyth.Menu
                     keysPressed.Add(key);
 
                     if (lastPressedKeys.Contains(key)) continue;
+
                     if (UnityInput.GetKey(Key.LeftCtrl))
                     {
                         switch (key)
@@ -1665,7 +1682,8 @@ namespace Seralyth.Menu
                                 keyboardInput += GUIUtility.systemCopyBuffer;
                                 break;
                             case Key.Backspace:
-                                keyboardInput = keyboardInput[..^1];
+                                if (!string.IsNullOrEmpty(keyboardInput)) 
+                                    keyboardInput = keyboardInput[..^1];
                                 break;
                         }
                     }
@@ -1674,89 +1692,36 @@ namespace Seralyth.Menu
                         switch (key)
                         {
                             case Key.Backspace:
-                                if (keyboardInput.Length > 0)
+                                if (!string.IsNullOrEmpty(keyboardInput))
                                     keyboardInput = keyboardInput[..^1];
                                 break;
                             case Key.Escape:
                                 Toggle(isSearching ? "Search" : "Decline Prompt");
-
                                 break;
                             case Key.Enter:
-                                if (isSearching)
-                                {
-                                    List<ButtonInfo> searchedMods = new List<ButtonInfo>();
-                                    if (nonGlobalSearch && Buttons.CurrentCategoryName != "Main")
-                                    {
-                                        foreach (ButtonInfo v in Buttons.buttons[Buttons.CurrentCategoryIndex])
-                                        {
-                                            try
-                                            {
-                                                List<string> texts = v.aliases == null ? new List<string>() : v.aliases.ToList();
-                                                texts.Add(v.overlapText ?? v.buttonText);
-
-                                                if (texts.Any(buttonText => buttonText.ClearTags().Replace(" ", "").ToLower().Contains(keyboardInput.Replace(" ", "").ToLower())))
-                                                    searchedMods.Add(v);
-                                            }
-                                            catch { }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        int categoryIndex = 0;
-                                        foreach (ButtonInfo[] buttonInfos in Buttons.buttons)
-                                        {
-                                            foreach (ButtonInfo v in buttonInfos)
-                                            {
-                                                try
-                                                {
-                                                    if (((Buttons.categoryNames[categoryIndex].Contains("Admin") ||
-                                                          Buttons.categoryNames[categoryIndex] == "Mod Givers") &&
-                                                         !isAdmin)
-                                                        || (v.detected && !allowDetected))
-                                                        continue;
-
-                                                    List<string> texts = v.aliases == null ? new List<string>() : v.aliases.ToList();
-                                                    texts.Add(v.overlapText ?? v.buttonText);
-
-                                                    if (texts.Any(buttonText => buttonText.ClearTags().Replace(" ", "").ToLower().Contains(keyboardInput.Replace(" ", "").ToLower())))
-                                                        searchedMods.Add(v);
-                                                }
-                                                catch { }
-                                            }
-                                            categoryIndex++;
-                                        }
-                                    }
-
-                                    ButtonInfo[] buttons = StringsToInfos(Alphabetize(InfosToStrings(searchedMods.ToArray())));
-                                    ButtonInfo button = buttons[0];
-
-                                    if (button.incremental)
-                                        ToggleIncremental(button.buttonText, UnityInput.GetKey(Key.LeftShift));
-                                    else
-                                        Toggle(buttons[0].buttonText, true);
-                                }
-                                else if (CurrentPrompt != null && CurrentPrompt.IsText)
-                                    Toggle("Accept Prompt");
-
+                                HandleSearchOrPrompt();
+                                break;
+                            case Key.Space:
+                                keyboardInput += " ";
                                 break;
                             default:
-                                if (Keyboard.current.backspaceKey.wasPressedThisFrame)
+                                string keyName = key.ToString();
+                                if (keyName.Length == 1)
                                 {
-                                    if (!string.IsNullOrEmpty(keyboardInput))
-                                        keyboardInput = keyboardInput.Substring(0, keyboardInput.Length - 1);
+                                    bool isShift = UnityInput.GetKey(Key.LeftShift) || UnityInput.GetKey(Key.RightShift);
+                                    keyboardInput += isShift ? keyName.ToUpper() : keyName.ToLower();
                                 }
-                                Keyboard.current.onTextInput += c =>
+                                else if (keyName.StartsWith("Digit"))
                                 {
-                                    if (char.IsControl(c))
-                                        return;
-                                    keyboardInput += c;
-                                };
+                                    keyboardInput += keyName.Replace("Digit", "");
+                                }
                                 break;
                         }
                     }
 
                     if (pcKeyboardSounds)
                         VRRig.LocalRig.PlayHandTapLocal(66, false, buttonClickVolume / 10f);
+
                     pageNumber = 0;
 
                     if (!clickGUI)
@@ -1765,10 +1730,73 @@ namespace Seralyth.Menu
                         Settings.UpdateSearch();
                 }
                 else
+                {
                     keyPressedTimes.Remove(key);
+                }
             }
 
             lastPressedKeys = keysPressed;
+        }
+        private static void HandleSearchOrPrompt()
+        {
+            if (isSearching)
+            {
+                List<ButtonInfo> searchedMods = new List<ButtonInfo>();
+                if (nonGlobalSearch && Buttons.CurrentCategoryName != "Main")
+                {
+                    foreach (ButtonInfo v in Buttons.buttons[Buttons.CurrentCategoryIndex])
+                    {
+                        try
+                        {
+                            List<string> texts = v.aliases == null ? new List<string>() : v.aliases.ToList();
+                            texts.Add(v.overlapText ?? v.buttonText);
+
+                            if (texts.Any(buttonText => buttonText.ClearTags().Replace(" ", "").ToLower().Contains(keyboardInput.Replace(" ", "").ToLower())))
+                                searchedMods.Add(v);
+                        }
+                        catch { }
+                    }
+                }
+                else
+                {
+                    int categoryIndex = 0;
+                    foreach (ButtonInfo[] buttonInfos in Buttons.buttons)
+                    {
+                        foreach (ButtonInfo v in buttonInfos)
+                        {
+                            try
+                            {
+                                if (((Buttons.categoryNames[categoryIndex].Contains("Admin") ||
+                                     Buttons.categoryNames[categoryIndex] == "Mod Givers") && !isAdmin) || (v.detected && !allowDetected))
+                                    continue;
+
+                                List<string> texts = v.aliases == null ? new List<string>() : v.aliases.ToList();
+                                texts.Add(v.overlapText ?? v.buttonText);
+
+                                if (texts.Any(buttonText => buttonText.ClearTags().Replace(" ", "").ToLower().Contains(keyboardInput.Replace(" ", "").ToLower())))
+                                    searchedMods.Add(v);
+                            }
+                            catch { }
+                        }
+                        categoryIndex++;
+                    }
+                }
+
+                if (searchedMods.Count > 0)
+                {
+                    ButtonInfo[] buttons = StringsToInfos(Alphabetize(InfosToStrings(searchedMods.ToArray())));
+                    ButtonInfo button = buttons[0];
+
+                    if (button.incremental)
+                        ToggleIncremental(button.buttonText, UnityInput.GetKey(Key.LeftShift));
+                    else
+                        Toggle(buttons[0].buttonText, true);
+                }
+            }
+            else if (CurrentPrompt != null && CurrentPrompt.IsText)
+            {
+                Toggle("Accept Prompt");
+            }
         }
 
         public static void PressKeyboardKey(string key)
@@ -1779,7 +1807,7 @@ namespace Seralyth.Menu
                     keyboardInput += " ";
                     break;
                 case "Backspace":
-                    if (keyboardInput.Length > 0)
+                    if (!string.IsNullOrEmpty(keyboardInput))
                         keyboardInput = keyboardInput[..^1];
                     break;
                 case "Shift":
