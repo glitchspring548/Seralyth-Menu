@@ -3925,6 +3925,7 @@ namespace Seralyth.Mods
         public static readonly Dictionary<VRRig, List<GameObject>> RigColliders = new Dictionary<VRRig, List<GameObject>>();
         public static void SolidPlayers()
         {
+            bool visualize = true;
             List<VRRig> toRemove = new List<VRRig>();
             foreach (VRRig rig in RigColliders.Keys)
             {
@@ -3947,15 +3948,19 @@ namespace Seralyth.Mods
                     colliders = new List<GameObject>();
 
                     GameObject bodyCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    bodyCollider.GetComponent<Renderer>().enabled = false;
+                    colliders.Add(bodyCollider);
+                    var bodyRenderer = bodyCollider.GetComponent<Renderer>().enabled = false;
                     bodyCollider.transform.localScale = new Vector3(0.3f, 0.55f, 0.3f);
 
                     for (int i = 0; i < 19; i++)
                     {
-                        bodyCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        bodyCollider.GetComponent<Renderer>().enabled = false;
-                        bodyCollider.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                        GameObject boneCollider = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                        colliders.Add(boneCollider);
+                        var boneRenderer = boneCollider.GetComponent<Renderer>().enabled = false;
+                        boneCollider.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
                     }
+
+                    RigColliders[vrrig] = colliders;
                 }
 
                 colliders[0].transform.position = vrrig.head.rigTarget.transform.position + new Vector3(0f, -0.12f, 0f);
@@ -3964,7 +3969,6 @@ namespace Seralyth.Mods
                 for (int i = 0; i < 19; i++)
                 {
                     GameObject boneCollider = colliders[i + 1];
-
                     Vector3 pointA = vrrig.mainSkin.bones[Visuals.bones[i * 2]].position;
                     Vector3 pointB = vrrig.mainSkin.bones[Visuals.bones[i * 2 + 1]].position;
 
