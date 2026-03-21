@@ -823,7 +823,7 @@ namespace Seralyth.Managers
             {
                 command = "macro",
                 target = uid,
-                macro = sendingMacro.Value.DumpJSON()
+                macro = sendingMacro.DumpJSON()
             }));
 
             NotificationManager.SendNotification("<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> Successfully shared macro.", 5000);

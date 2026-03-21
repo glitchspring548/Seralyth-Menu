@@ -1932,14 +1932,14 @@ namespace Seralyth.Mods
                 new Quaternion((float)obj["x"], (float)obj["y"], (float)obj["z"], (float)obj["w"]);
         }
 
-        public struct Macro
+        public class Macro
         {
             public List<PlayerPosition> positions;
             public float macroStepDuration;
             public string name;
             public bool enabled;
 
-            public readonly string DumpJSON()
+            public string DumpJSON()
             {
                 var obj = new JObject
                 {
@@ -1948,7 +1948,6 @@ namespace Seralyth.Mods
                     ["positions"] = new JArray(positions.ConvertAll(p => p.ToJObject())),
                     ["step-time"] = macroStepDuration
                 };
-
                 return obj.ToString();
             }
 
@@ -2021,7 +2020,42 @@ namespace Seralyth.Mods
                 new ButtonInfo { buttonText = "Record <color=grey>[</color><color=green>T</color><color=grey>]</color>", method = RecordMacro, toolTip = "Record your macros with your <color=green>left trigger</color>." },
                 new ButtonInfo { buttonText = "Open Macros Folder", method = OpenMacrosFolder, isTogglable = false, toolTip = "Opens the folder in which your plugins are located." },
                 new ButtonInfo { buttonText = "Reload Macros", method = LoadMacros, isTogglable = false, toolTip = "Reloads your macros." },
-                new ButtonInfo { buttonText = "Disable Macros", enableMethod =() => disableMacros = true, disableMethod =() => disableMacros = false, toolTip = "Disables all macros." }
+                new ButtonInfo
+                {
+                    buttonText = "Enable All Macros",
+                    method = () =>
+                    {
+                        foreach (var kvp in macros)
+                        {
+                            string macroName = kvp.Key;
+                            kvp.Value.enabled = true;
+                            ToggleMacro(macroName, true);
+                        }
+
+                        LoadMacros();
+                    },
+                    isTogglable = false,
+                    toolTip = "Enables all macros."
+                },
+                new ButtonInfo
+                {
+                    buttonText = "Disable All Macro",
+                    method = () =>
+                    {
+                        foreach (var kvp in macros)
+                        {
+                            string macroName = kvp.Key;
+                            kvp.Value.enabled = false;
+                            ToggleMacro(macroName, false);
+                        }
+
+                        StopMacro();
+                        LoadMacros();
+                    },
+                    isTogglable = false,
+                    toolTip = "Disables all macros."
+                }
+
             });
             Buttons.buttons[Buttons.GetCategory("Macros")] = buttons.ToArray();
         }
@@ -2233,12 +2267,8 @@ namespace Seralyth.Mods
         public static bool midpointMacros;
         public static bool didMacro;
         public static bool directionBased;
-        public static bool disableMacros;
         public static void ExecuteMacroButton(Macro macro)
         {
-            if (disableMacros)
-                return;
-
             didMacro = midpointMacros && (didMacro
                 ? rightTrigger >= 0.5f
                 : activeMacro != null);
