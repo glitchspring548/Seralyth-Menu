@@ -19,8 +19,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using Seralyth.Menu;
 using Seralyth.Managers;
+using Seralyth.Menu;
 using UnityEngine;
 
 namespace Seralyth

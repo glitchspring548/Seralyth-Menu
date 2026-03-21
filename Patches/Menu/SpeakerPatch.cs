@@ -22,7 +22,6 @@
 using HarmonyLib;
 using Photon.Voice;
 using Photon.Voice.Unity;
-using Seralyth.Mods;
 using System.Collections.Generic;
 
 namespace Seralyth.Patches.Menu

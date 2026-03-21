@@ -1,5 +1,4 @@
-﻿using BepInEx;
-using ExitGames.Client.Photon;
+﻿using ExitGames.Client.Photon;
 using GorillaExtensions;
 using GorillaLocomotion;
 using Photon.Pun;

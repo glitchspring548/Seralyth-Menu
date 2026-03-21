@@ -23,7 +23,6 @@ using GorillaLocomotion;
 using Seralyth.Classes.Menu;
 using Seralyth.Extensions;
 using Seralyth.Menu;
-using Seralyth.Mods;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,9 +30,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static Seralyth.Managers.VoiceManager;
 using static Seralyth.Menu.Main;
-using static Seralyth.Utilities.AssetUtilities;
 
 namespace Seralyth.Managers
 {

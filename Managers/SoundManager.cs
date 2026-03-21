@@ -18,14 +18,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+using Photon.Pun;
+using Seralyth.Menu;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
 using static Seralyth.Menu.Main;
 using static Seralyth.Utilities.AssetUtilities;
-using Seralyth;
-using Seralyth.Menu;
 
 namespace Seralyth.Managers
 {
@@ -112,7 +111,7 @@ namespace Seralyth.Managers
                 { "GMod Error", "Audio/Menu/Notifications/gmod-error.ogg" }
             }
         };
-         
+
         public static Dictionary<string, string> DefaultSounds = new Dictionary<string, string>
         {
             { "Button", "Default" },
@@ -245,7 +244,7 @@ namespace Seralyth.Managers
                                 else
                                     audioSource.PlayOneShot(clip, buttonClickVolume / 10f);
                             }
-                        )); 
+                        ));
                         break;
                 }
 

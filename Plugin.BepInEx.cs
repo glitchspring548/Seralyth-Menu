@@ -20,7 +20,6 @@
  */
 
 using BepInEx;
-using BepInEx.Logging;
 using Seralyth.Managers;
 using Seralyth.Menu;
 using System.ComponentModel;

@@ -897,7 +897,7 @@ namespace Seralyth.Mods
             RankedPatch.targetPlatform = target;
         }
 
-        
+
         public static void SpoofPlatform(bool enabled)
         {
             GorillaTagger.Instance.myVRRig.SendRPC("RPC_UpdateRankedInfo", RpcTarget.Others, 0, enabled ? 1 : 0, enabled ? 0 : 1);

@@ -66,7 +66,7 @@ namespace Seralyth.Managers
             public float Pitch { get; set; } = 1f;
             public bool IsPaused { get; private set; }
             public float Length => (Samples != null && Channels > 0)
-                ? (float)(Samples.Length / Channels) / VoiceManager.Instance.OutputRate
+                ? (float)(Samples.Length / Channels) / Instance.OutputRate
                 : 0f;
             public float CurrentTime
             {

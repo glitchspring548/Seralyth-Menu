@@ -91,7 +91,7 @@ namespace Seralyth.Menu
             activeFont = AgencyFB;
 
             if (Bootstrapper.FirstLaunch && Directory.Exists("iisStupidMenu"))
-                    Prompt("It seems like you have used ii's Stupid Menu before! Would you like to move all your enabled mods, settings and sounds to Seralyth Menu?", Settings.MergePreferences_iisStupidMenu);
+                Prompt("It seems like you have used ii's Stupid Menu before! Would you like to move all your enabled mods, settings and sounds to Seralyth Menu?", Settings.MergePreferences_iisStupidMenu);
 
             //if (Plugin.FirstLaunch)
             //    Prompt("It seems like this is your first time using the menu. Would you like to watch a quick tutorial to get to know how to use it?", Settings.ShowTutorial);
@@ -804,7 +804,7 @@ namespace Seralyth.Menu
                                 pageButtonChangeDelay = Time.time + 0.2f;
                                 if (exclusivePageSounds || (!string.IsNullOrEmpty(SoundManager.DefaultSoundpack) && SoundManager.DefaultSoundpack != "None"))
                                     SoundManager.Play("Next");
-                                else 
+                                else
                                     SoundManager.Play("Button");
                                 Toggle("NextPage");
                             }
@@ -1682,7 +1682,7 @@ namespace Seralyth.Menu
                                 keyboardInput += GUIUtility.systemCopyBuffer;
                                 break;
                             case Key.Backspace:
-                                if (!string.IsNullOrEmpty(keyboardInput)) 
+                                if (!string.IsNullOrEmpty(keyboardInput))
                                     keyboardInput = keyboardInput[..^1];
                                 break;
                         }
@@ -4450,7 +4450,7 @@ namespace Seralyth.Menu
                 Right = GunTransform.right;
             }
 
-                        Physics.Raycast(StartPosition + Direction / 4f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f), Direction, out var Ray, 512f, overrideLayerMask ?? NoInvisLayerMask());
+            Physics.Raycast(StartPosition + Direction / 4f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f), Direction, out var Ray, 512f, overrideLayerMask ?? NoInvisLayerMask());
 
             if (shouldBePC)
             {

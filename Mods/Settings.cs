@@ -6357,7 +6357,7 @@ namespace Seralyth.Mods
             }
             catch { LogManager.Log("Save file out of date"); }
 
-            
+
             pageButtonType = int.Parse(textData[3]) - 1;
             Toggle("Change Page Type");
             themeType = int.Parse(textData[4]) - 1;
