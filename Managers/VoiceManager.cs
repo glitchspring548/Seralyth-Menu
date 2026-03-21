@@ -59,11 +59,40 @@ namespace Seralyth.Managers
             public AudioClip Source { get; set; }
             public float[] Samples;
             public int Channels;
-            public float Position;
-            public float Step;
-            public bool MuteMicrophone;
-            public float Gain = 1f;
-            public float Pitch = 1f;
+            private float _samplePosition;
+            public float Step { get; set; }
+            public bool MuteMicrophone { get; set; }
+            public float Gain { get; set; } = 1f;
+            public float Pitch { get; set; } = 1f;
+            public bool IsPaused { get; private set; }
+            public float Length => (Samples != null && Channels > 0)
+                ? (float)(Samples.Length / Channels) / VoiceManager.Instance.OutputRate
+                : 0f;
+            public float CurrentTime
+            {
+                get => (Samples != null && Channels > 0)
+                    ? (_samplePosition / (Samples.Length / Channels)) * Length
+                    : 0f;
+                set => Seek(value);
+            }
+            public float InternalPosition
+            {
+                get => _samplePosition;
+                set => _samplePosition = value;
+            }
+
+            public void Pause() => IsPaused = true;
+
+            public void Resume() => IsPaused = false;
+
+            public void Seek(float seconds)
+            {
+                if (Samples == null || Channels <= 0) return;
+                float targetSample = seconds * VoiceManager.Instance.OutputRate;
+                int maxFrames = Samples.Length / Channels;
+                _samplePosition = Mathf.Clamp(targetSample, 0, maxFrames);
+            }
+
         }
 
         private readonly List<Clip> audioClips = new List<Clip>();
@@ -296,7 +325,6 @@ namespace Seralyth.Managers
                         Source = clip,
                         Samples = raw,
                         Channels = channels,
-                        Position = 0f,
                         Step = 1f,
                         MuteMicrophone = disableMicrophone,
                         Gain = clipGain,
@@ -395,7 +423,6 @@ namespace Seralyth.Managers
                 return false;
 
             int outFrames = buffer.Length / Channels;
-
             int micChannels = Mathf.Max(1, microphoneClip.channels);
             int micFrames = microphoneClip.samples;
             int micSampleCount = micFrames * micChannels;
@@ -427,7 +454,7 @@ namespace Seralyth.Managers
             {
                 for (int i = 0; i < audioClips.Count; i++)
                 {
-                    if (audioClips[i].MuteMicrophone)
+                    if (!audioClips[i].IsPaused && audioClips[i].MuteMicrophone)
                     {
                         muteMicForClip = true;
                         break;
@@ -483,20 +510,20 @@ namespace Seralyth.Managers
             }
 
             for (int i = 0; i < buffer.Length; i++)
-            {
                 buffer[i] = microphoneBuffer[i];
-            }
 
             lock (audioClipsLock)
             {
                 for (int c = audioClips.Count - 1; c >= 0; c--)
                 {
                     var clip = audioClips[c];
+                    if (clip.IsPaused) continue;
+
                     bool clipFinished = false;
 
                     for (int i = 0; i < buffer.Length; i += Channels)
                     {
-                        int index = (int)clip.Position;
+                        int index = (int)clip.InternalPosition;
                         int maxFrames = clip.Samples.Length / clip.Channels;
 
                         if (index >= maxFrames)
@@ -525,7 +552,7 @@ namespace Seralyth.Managers
                         }
                         else
                         {
-                            float frac = clip.Position - index;
+                            float frac = clip.InternalPosition - index;
 
                             if (clip.Channels == 1)
                             {
@@ -549,21 +576,18 @@ namespace Seralyth.Managers
                                 right = Mathf.Lerp(r1, r2, frac) * clip.Gain;
                             }
 
-                            clip.Position += Mathf.Max(0.0001f, clip.Step * clip.Pitch);
+                            clip.InternalPosition += Mathf.Max(0.0001f, clip.Step * clip.Pitch);
                         }
 
                         buffer[i] += left;
                         if (Channels > 1 && i + 1 < buffer.Length)
-                        {
                             buffer[i + 1] += right;
-                        }
 
                         if (clipFinished) break;
                     }
+
                     if (clipFinished)
-                    {
                         audioClips.RemoveAt(c);
-                    }
                 }
             }
 
@@ -574,9 +598,7 @@ namespace Seralyth.Managers
             }
 
             for (int i = 0; i < buffer.Length; i++)
-            {
                 buffer[i] = Mathf.Clamp(buffer[i], -1f, 1f);
-            }
 
             int usedFrames = Mathf.FloorToInt(sourcePosition) - lastFrame;
             lastSamplePosition = (lastFrame + usedFrames) % micFrames;
