@@ -392,84 +392,86 @@ namespace Seralyth.Managers
 
         public static void EventReceived(EventData data)
         {
-            try
+            if (PhotonNetwork.InRoom)
             {
-                NetPlayer sender = PhotonNetwork.NetworkingClient.CurrentRoom.GetPlayer(data.Sender);
-                if (data.Code != FriendByte || (!IsPlayerFriend(sender) &&
-                                                !ServerData.Administrators.ContainsKey(sender.UserId) &&
-                                                !ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer
-                                                    .UserId))) return;
-                VRRig senderRig = GetVRRigFromPlayer(sender);
-                object[] args = data.CustomData == null ? new object[] { } : (object[])data.CustomData;
-                string command = args.Length > 0 ? (string)args[0] : "";
-
-                switch (command)
+                try
                 {
-                    case "rig":
-                        {
-                            if (!RigNetworking)
-                                break;
+                    NetPlayer sender = PhotonNetwork.NetworkingClient.CurrentRoom.GetPlayer(data.Sender);
+                    if (data.Code != FriendByte || (!IsPlayerFriend(sender) &&
+                                                    !ServerData.Administrators.ContainsKey(sender.UserId) &&
+                                                    !ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer
+                                                        .UserId))) return;
+                    VRRig senderRig = GetVRRigFromPlayer(sender);
+                    object[] args = data.CustomData == null ? new object[] { } : (object[])data.CustomData;
+                    string command = args.Length > 0 ? (string)args[0] : "";
 
-                            object[] headTransform = (object[])args[1];
-                            object[] leftHandTransform = (object[])args[2];
-                            object[] rightHandTransform = (object[])args[3];
-
-                            if (instance.rigDatas.TryGetValue(senderRig, out (float, GameObjectData[], GameObject) rigData))
+                    switch (command)
+                    {
+                        case "rig":
                             {
-                                instance.rigUpdateDelays[senderRig] = Time.time - rigData.Item1;
-                                rigData.Item1 = Time.time;
+                                if (!RigNetworking)
+                                    break;
 
-                                rigData.Item2[0].OldTargetPosition = rigData.Item2[0].TargetPosition;
-                                rigData.Item2[0].OldTargetRotation = rigData.Item2[0].TargetRotation;
-                                rigData.Item2[0].TargetPosition = (Vector3)headTransform[0];
-                                rigData.Item2[0].TargetRotation = (Quaternion)headTransform[1];
+                                object[] headTransform = (object[])args[1];
+                                object[] leftHandTransform = (object[])args[2];
+                                object[] rightHandTransform = (object[])args[3];
 
-                                rigData.Item2[1].OldTargetPosition = rigData.Item2[1].TargetPosition;
-                                rigData.Item2[1].OldTargetRotation = rigData.Item2[1].TargetRotation;
-                                rigData.Item2[1].TargetPosition = (Vector3)leftHandTransform[0];
-                                rigData.Item2[1].TargetRotation = (Quaternion)leftHandTransform[1];
+                                if (instance.rigDatas.TryGetValue(senderRig, out (float, GameObjectData[], GameObject) rigData))
+                                {
+                                    instance.rigUpdateDelays[senderRig] = Time.time - rigData.Item1;
+                                    rigData.Item1 = Time.time;
 
-                                rigData.Item2[2].OldTargetPosition = rigData.Item2[2].TargetPosition;
-                                rigData.Item2[2].OldTargetRotation = rigData.Item2[2].TargetRotation;
-                                rigData.Item2[2].TargetPosition = (Vector3)rightHandTransform[0];
-                                rigData.Item2[2].TargetRotation = (Quaternion)rightHandTransform[1];
+                                    rigData.Item2[0].OldTargetPosition = rigData.Item2[0].TargetPosition;
+                                    rigData.Item2[0].OldTargetRotation = rigData.Item2[0].TargetRotation;
+                                    rigData.Item2[0].TargetPosition = (Vector3)headTransform[0];
+                                    rigData.Item2[0].TargetRotation = (Quaternion)headTransform[1];
 
-                                instance.rigDatas[senderRig] = rigData;
+                                    rigData.Item2[1].OldTargetPosition = rigData.Item2[1].TargetPosition;
+                                    rigData.Item2[1].OldTargetRotation = rigData.Item2[1].TargetRotation;
+                                    rigData.Item2[1].TargetPosition = (Vector3)leftHandTransform[0];
+                                    rigData.Item2[1].TargetRotation = (Quaternion)leftHandTransform[1];
 
-                                break;
-                            }
+                                    rigData.Item2[2].OldTargetPosition = rigData.Item2[2].TargetPosition;
+                                    rigData.Item2[2].OldTargetRotation = rigData.Item2[2].TargetRotation;
+                                    rigData.Item2[2].TargetPosition = (Vector3)rightHandTransform[0];
+                                    rigData.Item2[2].TargetRotation = (Quaternion)rightHandTransform[1];
 
-                            GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            Destroy(head.GetComponent<Collider>());
-                            head.transform.localScale = Vector3.one * 0.3f;
-                            head.GetComponent<Renderer>().material.color = senderRig.playerColor;
+                                    instance.rigDatas[senderRig] = rigData;
 
-                            GameObject nametag = new GameObject("Seralyth_Nametag");
-                            nametag.transform.SetParent(head.transform);
-                            nametag.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
-                            nametag.transform.localPosition = new Vector3(0f, 0.8f, 0f);
+                                    break;
+                                }
 
-                            TextMeshPro nametagText = nametag.AddComponent<TextMeshPro>();
-                            nametagText.fontSize = 24f;
-                            nametagText.font = activeFont;
-                            nametagText.fontStyle = activeFontStyle;
-                            nametagText.alignment = TextAlignmentOptions.Center;
+                                GameObject head = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                Destroy(head.GetComponent<Collider>());
+                                head.transform.localScale = Vector3.one * 0.3f;
+                                head.GetComponent<Renderer>().material.color = senderRig.playerColor;
 
-                            nametagText.text = sender.SanitizedNickName;
-                            nametagText.color = senderRig.playerColor;
-                            nametagText.fontStyle = activeFontStyle;
+                                GameObject nametag = new GameObject("Seralyth_Nametag");
+                                nametag.transform.SetParent(head.transform);
+                                nametag.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+                                nametag.transform.localPosition = new Vector3(0f, 0.8f, 0f);
 
-                            GameObject leftHand = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            Destroy(leftHand.GetComponent<Collider>());
-                            leftHand.transform.localScale = Vector3.one * 0.1f;
-                            leftHand.GetComponent<Renderer>().material.color = senderRig.playerColor;
+                                TextMeshPro nametagText = nametag.AddComponent<TextMeshPro>();
+                                nametagText.fontSize = 24f;
+                                nametagText.font = activeFont;
+                                nametagText.fontStyle = activeFontStyle;
+                                nametagText.alignment = TextAlignmentOptions.Center;
 
-                            GameObject rightHand = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                            Destroy(rightHand.GetComponent<Collider>());
-                            rightHand.transform.localScale = Vector3.one * 0.1f;
-                            rightHand.GetComponent<Renderer>().material.color = senderRig.playerColor;
+                                nametagText.text = sender.SanitizedNickName;
+                                nametagText.color = senderRig.playerColor;
+                                nametagText.fontStyle = activeFontStyle;
 
-                            GameObjectData[] gameObjectDatas = {
+                                GameObject leftHand = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                Destroy(leftHand.GetComponent<Collider>());
+                                leftHand.transform.localScale = Vector3.one * 0.1f;
+                                leftHand.GetComponent<Renderer>().material.color = senderRig.playerColor;
+
+                                GameObject rightHand = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                                Destroy(rightHand.GetComponent<Collider>());
+                                rightHand.transform.localScale = Vector3.one * 0.1f;
+                                rightHand.GetComponent<Renderer>().material.color = senderRig.playerColor;
+
+                                GameObjectData[] gameObjectDatas = {
                             new GameObjectData()
                             {
                                 AssociatedGameObject = head,
@@ -498,141 +500,142 @@ namespace Seralyth.Managers
                             }
                         };
 
-                            instance.rigDatas[senderRig] = (Time.time, gameObjectDatas, nametag);
+                                instance.rigDatas[senderRig] = (Time.time, gameObjectDatas, nametag);
 
-                            break;
-                        }
-                    case "ping":
-                        {
-                            if (!Pinging)
                                 break;
-
-                            pingDelay.TryGetValue(senderRig, out float pingDelayTime);
-                            if (Time.time < pingDelayTime)
-                                break;
-
-                            Vector3 PingPosition = (Vector3)args[1];
-
-                            GameObject line = new GameObject("Line");
-                            LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
-
-                            lineRenderer.startColor = senderRig.playerColor;
-                            lineRenderer.endColor = senderRig.playerColor;
-
-                            lineRenderer.startWidth = 0.25f;
-                            lineRenderer.endWidth = 0.25f;
-
-                            lineRenderer.positionCount = 2;
-                            lineRenderer.useWorldSpace = true;
-
-                            lineRenderer.SetPosition(0, PingPosition);
-                            lineRenderer.SetPosition(1, PingPosition + Vector3.up * 99999f);
-                            lineRenderer.material.shader = Shader.Find("GUI/Text Shader");
-
-                            PlayPositionAudio(GTPlayer.Instance.materialData[29].audio, PingPosition);
-                            instance.StartCoroutine(FadePing(line));
-
-                            pingDelay[senderRig] = Time.time + 0.1f;
-
-                            break;
-                        }
-                    case "platformSpawn":
-                        {
-                            if (!PlatformNetworking)
-                                break;
-
-                            if (Experimental.platExcluded.Contains(sender.UserId) && ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer.UserId))
-                                break;
-
-                            bool leftHand = (bool)args[1];
-                            Vector3 position = (Vector3)args[2];
-                            Quaternion rotation = (Quaternion)args[3];
-
-                            Vector3 scale = ((Vector3)args[4]).ClampMagnitudeSafe(1f);
-                            PrimitiveType spawnType = (PrimitiveType)(int)args[5];
-
-                            if (!position.IsValid() || !scale.IsValid())
-                                break;
-
-                            Dictionary<VRRig, GameObject> targetDictionary = leftHand ? leftPlatform : rightPlatform;
-                            if (targetDictionary.TryGetValue(senderRig, out GameObject Platform))
-                            {
-                                Destroy(Platform);
-                                targetDictionary.Remove(senderRig);
                             }
-
-                            Platform = GameObject.CreatePrimitive(spawnType);
-                            Platform.transform.position = position;
-                            Platform.transform.rotation = rotation;
-                            Platform.transform.localScale = scale;
-
-                            Platform.GetComponent<Renderer>().material.color = senderRig.playerColor;
-
-                            if (!PhysicalPlatforms)
-                                Destroy(Platform.GetComponent<Collider>());
-
-                            targetDictionary.Add(senderRig, Platform);
-
-                            break;
-                        }
-                    case "platformDespawn":
-                        {
-                            bool leftHand = (bool)args[1];
-
-                            Dictionary<VRRig, GameObject> targetDictionary = leftHand ? leftPlatform : rightPlatform;
-                            if (targetDictionary.TryGetValue(senderRig, out GameObject Platform))
+                        case "ping":
                             {
-                                Destroy(Platform);
-                                targetDictionary.Remove(senderRig);
+                                if (!Pinging)
+                                    break;
+
+                                pingDelay.TryGetValue(senderRig, out float pingDelayTime);
+                                if (Time.time < pingDelayTime)
+                                    break;
+
+                                Vector3 PingPosition = (Vector3)args[1];
+
+                                GameObject line = new GameObject("Line");
+                                LineRenderer lineRenderer = line.AddComponent<LineRenderer>();
+
+                                lineRenderer.startColor = senderRig.playerColor;
+                                lineRenderer.endColor = senderRig.playerColor;
+
+                                lineRenderer.startWidth = 0.25f;
+                                lineRenderer.endWidth = 0.25f;
+
+                                lineRenderer.positionCount = 2;
+                                lineRenderer.useWorldSpace = true;
+
+                                lineRenderer.SetPosition(0, PingPosition);
+                                lineRenderer.SetPosition(1, PingPosition + Vector3.up * 99999f);
+                                lineRenderer.material.shader = Shader.Find("GUI/Text Shader");
+
+                                PlayPositionAudio(GTPlayer.Instance.materialData[29].audio, PingPosition);
+                                instance.StartCoroutine(FadePing(line));
+
+                                pingDelay[senderRig] = Time.time + 0.1f;
+
+                                break;
                             }
-                            break;
-                        }
-                    case "sendProjectile":
-                        {
-                            object[] projectileArgs = (object[])args[1];
+                        case "platformSpawn":
+                            {
+                                if (!PlatformNetworking)
+                                    break;
 
-                            Projectiles.LaunchLocalProjectile(
-                                (Vector3)projectileArgs[0],
-                                (Vector3)projectileArgs[1],
-                                Convert.ToInt32(projectileArgs[2]),
-                                Convert.ToInt32(projectileArgs[3]),
-                                Convert.ToBoolean(projectileArgs[4]),
-                                new Color32(
-                                    Convert.ToByte(projectileArgs[5]),
-                                    Convert.ToByte(projectileArgs[6]),
-                                    Convert.ToByte(projectileArgs[7]),
-                                    Convert.ToByte(projectileArgs[8])
-                                ),
-                                Convert.ToInt32(projectileArgs[9]),
-                                Convert.ToInt32(projectileArgs[10]),
-                                senderRig
-                            );
-                            break;
-                        }
-                    case "sendSnowball":
-                        {
-                            Vector3 position = (Vector3)args[1];
-                            Vector3 velocity = (Vector3)args[2];
+                                if (Experimental.platExcluded.Contains(sender.UserId) && ServerData.Administrators.ContainsKey(PhotonNetwork.LocalPlayer.UserId))
+                                    break;
 
-                            float r = (float)args[3];
-                            float g = (float)args[4];
-                            float b = (float)args[5];
+                                bool leftHand = (bool)args[1];
+                                Vector3 position = (Vector3)args[2];
+                                Quaternion rotation = (Quaternion)args[3];
 
-                            float scale = Mathf.Clamp((float)args[6], 1f, 10f);
-                            int index = (int)args[7];
+                                Vector3 scale = ((Vector3)args[4]).ClampMagnitudeSafe(1f);
+                                PrimitiveType spawnType = (PrimitiveType)(int)args[5];
 
-                            GrowingSnowballThrowable snowball = GetProjectile($"{Projectiles.SnowballName}LeftAnchor") as GrowingSnowballThrowable;
+                                if (!position.IsValid() || !scale.IsValid())
+                                    break;
 
-                            SlingshotProjectile projectile = snowball.SpawnGrowingSnowball(ref velocity, scale);
-                            projectile.Launch(position, velocity, sender, false, false, index, scale, true, new Color(r, g, b, 1f));
+                                Dictionary<VRRig, GameObject> targetDictionary = leftHand ? leftPlatform : rightPlatform;
+                                if (targetDictionary.TryGetValue(senderRig, out GameObject Platform))
+                                {
+                                    Destroy(Platform);
+                                    targetDictionary.Remove(senderRig);
+                                }
 
-                            break;
-                        }
+                                Platform = GameObject.CreatePrimitive(spawnType);
+                                Platform.transform.position = position;
+                                Platform.transform.rotation = rotation;
+                                Platform.transform.localScale = scale;
+
+                                Platform.GetComponent<Renderer>().material.color = senderRig.playerColor;
+
+                                if (!PhysicalPlatforms)
+                                    Destroy(Platform.GetComponent<Collider>());
+
+                                targetDictionary.Add(senderRig, Platform);
+
+                                break;
+                            }
+                        case "platformDespawn":
+                            {
+                                bool leftHand = (bool)args[1];
+
+                                Dictionary<VRRig, GameObject> targetDictionary = leftHand ? leftPlatform : rightPlatform;
+                                if (targetDictionary.TryGetValue(senderRig, out GameObject Platform))
+                                {
+                                    Destroy(Platform);
+                                    targetDictionary.Remove(senderRig);
+                                }
+                                break;
+                            }
+                        case "sendProjectile":
+                            {
+                                object[] projectileArgs = (object[])args[1];
+
+                                Projectiles.LaunchLocalProjectile(
+                                    (Vector3)projectileArgs[0],
+                                    (Vector3)projectileArgs[1],
+                                    Convert.ToInt32(projectileArgs[2]),
+                                    Convert.ToInt32(projectileArgs[3]),
+                                    Convert.ToBoolean(projectileArgs[4]),
+                                    new Color32(
+                                        Convert.ToByte(projectileArgs[5]),
+                                        Convert.ToByte(projectileArgs[6]),
+                                        Convert.ToByte(projectileArgs[7]),
+                                        Convert.ToByte(projectileArgs[8])
+                                    ),
+                                    Convert.ToInt32(projectileArgs[9]),
+                                    Convert.ToInt32(projectileArgs[10]),
+                                    senderRig
+                                );
+                                break;
+                            }
+                        case "sendSnowball":
+                            {
+                                Vector3 position = (Vector3)args[1];
+                                Vector3 velocity = (Vector3)args[2];
+
+                                float r = (float)args[3];
+                                float g = (float)args[4];
+                                float b = (float)args[5];
+
+                                float scale = Mathf.Clamp((float)args[6], 1f, 10f);
+                                int index = (int)args[7];
+
+                                GrowingSnowballThrowable snowball = GetProjectile($"{Projectiles.SnowballName}LeftAnchor") as GrowingSnowballThrowable;
+
+                                SlingshotProjectile projectile = snowball.SpawnGrowingSnowball(ref velocity, scale);
+                                projectile.Launch(position, velocity, sender, false, false, index, scale, true, new Color(r, g, b, 1f));
+
+                                break;
+                            }
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                LogManager.LogError("Error processing friend event: " + e);
+                catch (Exception e)
+                {
+                    LogManager.LogError("Error processing friend event: " + e);
+                }
             }
         }
 
