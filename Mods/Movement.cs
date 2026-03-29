@@ -3925,7 +3925,6 @@ namespace Seralyth.Mods
         public static readonly Dictionary<VRRig, List<GameObject>> RigColliders = new Dictionary<VRRig, List<GameObject>>();
         public static void SolidPlayers()
         {
-            bool visualize = true;
             List<VRRig> toRemove = new List<VRRig>();
             foreach (VRRig rig in RigColliders.Keys)
             {
@@ -4683,14 +4682,14 @@ namespace Seralyth.Mods
             VRRig targetRig = GetVRRigFromPlayer(player);
             VRRig.LocalRig.enabled = false;
 
-            VRRig.LocalRig.transform.position = targetRig.transform.position;
-            VRRig.LocalRig.transform.rotation = targetRig.transform.rotation;
+            VRRig.LocalRig.transform.position = targetRig.syncPos;
+            VRRig.LocalRig.transform.rotation = targetRig.syncRotation;
 
-            VRRig.LocalRig.leftHand.rigTarget.transform.position = targetRig.leftHandTransform.position;
-            VRRig.LocalRig.rightHand.rigTarget.transform.position = targetRig.rightHandTransform.position;
+            VRRig.LocalRig.leftHand.rigTarget.transform.position = targetRig.leftHand.rigTarget.transform.position;
+            VRRig.LocalRig.rightHand.rigTarget.transform.position = targetRig.rightHand.rigTarget.transform.position;
 
-            VRRig.LocalRig.leftHand.rigTarget.transform.rotation = targetRig.leftHandTransform.rotation;
-            VRRig.LocalRig.rightHand.rigTarget.transform.rotation = targetRig.rightHandTransform.rotation;
+            VRRig.LocalRig.leftHand.rigTarget.transform.rotation = targetRig.leftHand.rigTarget.transform.rotation;
+            VRRig.LocalRig.rightHand.rigTarget.transform.rotation = targetRig.rightHand.rigTarget.transform.rotation;
 
             if (fingers)
             {
@@ -4711,7 +4710,7 @@ namespace Seralyth.Mods
                 VRRig.LocalRig.rightThumb.LerpFinger(1f, false);
             }
 
-            VRRig.LocalRig.head.rigTarget.transform.rotation = targetRig.headMesh.transform.rotation;
+            VRRig.LocalRig.head.rigTarget.transform.rotation = targetRig.head.rigTarget.transform.rotation;
         }
 
         public static void CopyMovementAll()
