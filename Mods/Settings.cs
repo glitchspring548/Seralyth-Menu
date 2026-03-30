@@ -5772,86 +5772,106 @@ namespace Seralyth.Mods
         public static bool lastTriggerSelect;
         public static void PlayerSelect()
         {
-            bool leftHand = rightHand || (bothHands && ControllerInputPoller.instance.rightControllerSecondaryButton);
-
-            var (_, _, _, forward, _) = leftHand ? ControllerUtilities.GetTrueLeftHand() : ControllerUtilities.GetTrueRightHand();
-            bool canSelect = NetworkSystem.Instance.InRoom && menu != null && reference != null && Vector3.Distance(menu.transform.position, reference.transform.position) > 0.5f;
-
-            if (canSelect)
+            if (XRSettings.isDeviceActive)
             {
-                if (selectObject == null)
-                    selectObject = new GameObject("Seralyth_PingLine");
+                bool leftHand = rightHand || (bothHands && ControllerInputPoller.instance.rightControllerSecondaryButton);
 
-                Color targetColor = Buttons.GetIndex("Swap GUI Colors").enabled ? buttonColors[1].GetCurrentColor() : backgroundColor.GetCurrentColor();
-                Color lineColor = targetColor;
-                lineColor.a = 0.15f;
+                var (_, _, _, forward, _) = leftHand ? ControllerUtilities.GetTrueLeftHand() : ControllerUtilities.GetTrueRightHand();
+                bool canSelect = NetworkSystem.Instance.InRoom && menu != null && reference != null && Vector3.Distance(menu.transform.position, reference.transform.position) > 0.5f;
 
-                LineRenderer pingLine = selectObject.GetOrAddComponent<LineRenderer>();
-                pingLine.material.shader = Shader.Find("GUI/Text Shader");
-                pingLine.startColor = lineColor;
-                pingLine.endColor = lineColor;
-                pingLine.startWidth = 0.025f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f);
-                pingLine.endWidth = 0.025f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f);
-                pingLine.positionCount = 2;
-                pingLine.useWorldSpace = true;
-                if (smoothLines)
+                if (canSelect)
                 {
-                    pingLine.numCapVertices = 10;
-                    pingLine.numCornerVertices = 5;
-                }
+                    if (selectObject == null)
+                        selectObject = new GameObject("Seralyth_PingLine");
 
-                Vector3 StartPosition = leftHand ? GorillaTagger.Instance.leftHandTransform.position : GorillaTagger.Instance.rightHandTransform.position;
-                Vector3 Direction = forward;
+                    Color targetColor = Buttons.GetIndex("Swap GUI Colors").enabled ? buttonColors[1].GetCurrentColor() : backgroundColor.GetCurrentColor();
+                    Color lineColor = targetColor;
+                    lineColor.a = 0.15f;
 
-                Physics.SphereCast(StartPosition + Direction / 4f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f), 0.15f, Direction, out var Ray, 512f, NoInvisLayerMask());
-                Vector3 EndPosition = Ray.point == Vector3.zero ? StartPosition + (Direction * 512f) : Ray.point;
-
-                pingLine.SetPosition(0, StartPosition);
-                pingLine.SetPosition(1, EndPosition);
-
-                VRRig rigTarget = Ray.collider.GetComponentInParent<VRRig>();
-                if (Ray.collider != null && rigTarget != null && !rigTarget.IsLocal())
-                {
-                    if (lastTarget != null && lastTarget != rigTarget)
+                    LineRenderer pingLine = selectObject.GetOrAddComponent<LineRenderer>();
+                    pingLine.material.shader = Shader.Find("GUI/Text Shader");
+                    pingLine.startColor = lineColor;
+                    pingLine.endColor = lineColor;
+                    pingLine.startWidth = 0.025f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f);
+                    pingLine.endWidth = 0.025f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f);
+                    pingLine.positionCount = 2;
+                    pingLine.useWorldSpace = true;
+                    if (smoothLines)
                     {
-                        lastTarget.mainSkin.material.shader = Shader.Find("GorillaTag/UberShader");
-                        if (lastTarget.mainSkin.material.name.Contains("gorilla_body"))
-                            lastTarget.mainSkin.material.color = lastTarget.playerColor;
-
-                        lastTarget = null;
+                        pingLine.numCapVertices = 10;
+                        pingLine.numCornerVertices = 5;
                     }
 
-                    if (lastTarget == null)
+                    Vector3 StartPosition = leftHand ? GorillaTagger.Instance.leftHandTransform.position : GorillaTagger.Instance.rightHandTransform.position;
+                    Vector3 Direction = forward;
+
+                    Physics.SphereCast(StartPosition + Direction / 4f * (scaleWithPlayer ? GTPlayer.Instance.scale : 1f), 0.15f, Direction, out var Ray, 512f, NoInvisLayerMask());
+                    Vector3 EndPosition = Ray.point == Vector3.zero ? StartPosition + (Direction * 512f) : Ray.point;
+
+                    pingLine.SetPosition(0, StartPosition);
+                    pingLine.SetPosition(1, EndPosition);
+
+                    VRRig rigTarget = Ray.collider.GetComponentInParent<VRRig>();
+                    if (Ray.collider != null && rigTarget != null && !rigTarget.IsLocal())
                     {
-                        Visuals.FixRigMaterialESPColors(rigTarget);
+                        if (lastTarget != null && lastTarget != rigTarget)
+                        {
+                            lastTarget.mainSkin.material.shader = Shader.Find("GorillaTag/UberShader");
+                            if (lastTarget.mainSkin.material.name.Contains("gorilla_body"))
+                                lastTarget.mainSkin.material.color = lastTarget.playerColor;
 
-                        rigTarget.mainSkin.material.shader = Shader.Find("GUI/Text Shader");
-                        rigTarget.mainSkin.material.color = targetColor;
+                            lastTarget = null;
+                        }
 
-                        GorillaTagger.Instance.StartVibration(leftHand, GorillaTagger.Instance.tagHapticStrength / 2f, 0.05f);
+                        if (lastTarget == null)
+                        {
+                            Visuals.FixRigMaterialESPColors(rigTarget);
 
-                        lastTarget = rigTarget;
+                            rigTarget.mainSkin.material.shader = Shader.Find("GUI/Text Shader");
+                            rigTarget.mainSkin.material.color = targetColor;
+
+                            GorillaTagger.Instance.StartVibration(leftHand, GorillaTagger.Instance.tagHapticStrength / 2f, 0.05f);
+
+                            lastTarget = rigTarget;
+                        }
+                        else
+                            lastTarget.mainSkin.material.color = targetColor;
+
+                        bool trigger = leftHand ? leftTrigger > 0.5f : rightTrigger > 0.5f;
+
+                        if (trigger && !lastTriggerSelect)
+                        {
+                            VRRig.LocalRig.PlayHandTapLocal(50, leftHand, 0.4f);
+                            GorillaTagger.Instance.StartVibration(leftHand, GorillaTagger.Instance.tagHapticStrength / 2f, GorillaTagger.Instance.tagHapticDuration / 2f);
+
+                            NavigatePlayer(GetPlayerFromVRRig(rigTarget));
+                            ReloadMenu();
+
+                            NotificationManager.SendNotification($"<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> Selected player {GetPlayerFromVRRig(rigTarget).NickName}.");
+                        }
+
+                        lastTriggerSelect = trigger;
                     }
                     else
-                        lastTarget.mainSkin.material.color = targetColor;
-
-                    bool trigger = leftHand ? leftTrigger > 0.5f : rightTrigger > 0.5f;
-
-                    if (trigger && !lastTriggerSelect)
                     {
-                        VRRig.LocalRig.PlayHandTapLocal(50, leftHand, 0.4f);
-                        GorillaTagger.Instance.StartVibration(leftHand, GorillaTagger.Instance.tagHapticStrength / 2f, GorillaTagger.Instance.tagHapticDuration / 2f);
+                        if (lastTarget != null)
+                        {
+                            lastTarget.mainSkin.material.shader = Shader.Find("GorillaTag/UberShader");
+                            if (lastTarget.mainSkin.material.name.Contains("gorilla_body"))
+                                lastTarget.mainSkin.material.color = lastTarget.playerColor;
 
-                        NavigatePlayer(GetPlayerFromVRRig(rigTarget));
-                        ReloadMenu();
-
-                        NotificationManager.SendNotification($"<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> Selected player {GetPlayerFromVRRig(rigTarget).NickName}.");
+                            lastTarget = null;
+                        }
                     }
-
-                    lastTriggerSelect = trigger;
                 }
                 else
                 {
+                    if (selectObject != null)
+                    {
+                        Object.Destroy(selectObject);
+                        selectObject = null;
+                    }
+
                     if (lastTarget != null)
                     {
                         lastTarget.mainSkin.material.shader = Shader.Find("GorillaTag/UberShader");
@@ -5860,26 +5880,9 @@ namespace Seralyth.Mods
 
                         lastTarget = null;
                     }
-                }
-            }
-            else
-            {
-                if (selectObject != null)
-                {
-                    Object.Destroy(selectObject);
-                    selectObject = null;
-                }
 
-                if (lastTarget != null)
-                {
-                    lastTarget.mainSkin.material.shader = Shader.Find("GorillaTag/UberShader");
-                    if (lastTarget.mainSkin.material.name.Contains("gorilla_body"))
-                        lastTarget.mainSkin.material.color = lastTarget.playerColor;
-
-                    lastTarget = null;
+                    lastTriggerSelect = false;
                 }
-
-                lastTriggerSelect = false;
             }
         }
 
