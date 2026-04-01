@@ -110,14 +110,14 @@ namespace Seralyth.Patches.Menu
                     {
                         if (error.ErrorMessage.ToLower().Contains("ban") || error.ErrorMessage.ToLower().Contains("banned") || error.ErrorMessage.ToLower().Contains("suspended") || error.ErrorMessage.ToLower().Contains("suspension"))
                         {
-                            if (error.ErrorMessage.ToLower().Contains("this ip has been banned"))
+                            if (error.ErrorMessage.ToLower().Contains("this ip"))
                                 NotificationManager.SendNotification("<color=grey>[</color><color=red>ANTI-BAN</color><color=grey>]</color> Your IP address is currently banned.");
                             else
                                 NotificationManager.SendNotification("<color=grey>[</color><color=red>ANTI-BAN</color><color=grey>]</color> Your account is currently banned.");
                             PlayFabError fakeError = new PlayFabError
                             {
-                                Error = PlayFabErrorCode.UnknownError,
-                                ErrorMessage = "An unknown error occurred.", // thinking of setting it to the original. I think the Error is the one that the game uses to crash you. Not the ErrorMessage. idk - kingofnetflix
+                                Error = PlayFabErrorCode.UnkownError,
+                                ErrorMessage = $"Your account has been banned. Hours left: {((int)((DateTime.Parse(error.ErrorDetails.GetEnumerator().Current.Value[0]) - DateTime.UtcNow).TotalHours + 1.0))}",
                                 ErrorDetails = new Dictionary<string, List<string>>()
                             };
                             errorCallback?.Invoke(fakeError);
