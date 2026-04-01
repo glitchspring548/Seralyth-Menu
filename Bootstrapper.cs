@@ -4,6 +4,7 @@ using Seralyth.Menu;
 using Seralyth.Patches;
 using Seralyth.Patches.Menu;
 using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -68,11 +69,21 @@ namespace Seralyth
             PatchHandler.PatchAll();
 
             Loader = new GameObject("Seralyth_Loader");
-            Loader.AddComponent<CoroutineManager>();
+            CoroutineManager coroutineManager = Loader.AddComponent<CoroutineManager>();
             Loader.AddComponent<NotificationManager>();
             Loader.AddComponent<CustomBoardManager>();
             Loader.AddComponent<UI>();
             UnityEngine.Object.DontDestroyOnLoad(Loader);
+
+            coroutineManager.StartCoroutine(PatchIntegrityCheck());
+        }
+
+        private static IEnumerator PatchIntegrityCheck()
+        {
+            if (PatchHandler.instance == null)
+                yield return null;
+
+            PatchHandler.PatchIntegrityCheck();
         }
     }
 }
