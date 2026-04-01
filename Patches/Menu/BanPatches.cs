@@ -22,6 +22,7 @@
 using GorillaNetworking;
 using HarmonyLib;
 using PlayFab;
+using PlayFab.ClientModels;
 using PlayFab.CloudScriptModels;
 using PlayFab.Internal;
 using Seralyth.Managers;
@@ -114,12 +115,25 @@ namespace Seralyth.Patches.Menu
                                 NotificationManager.SendNotification("<color=grey>[</color><color=red>ANTI-BAN</color><color=grey>]</color> Your IP address is currently banned.");
                             else
                                 NotificationManager.SendNotification("<color=grey>[</color><color=red>ANTI-BAN</color><color=grey>]</color> Your account is currently banned.");
-                            PlayFabError fakeError = new PlayFabError
+                            Dictionary<string, List<string>>.Enumerator enumerator = error.ErrorDetails.GetEnumerator();
+                            PlayFabError fakeError = null;
+                            if (enumerator.Current.Value[0] != "Indefinite")
                             {
-                                Error = PlayFabErrorCode.UnkownError,
-                                ErrorMessage = $"Your account has been banned. Hours left: {((int)((DateTime.Parse(error.ErrorDetails.GetEnumerator().Current.Value[0]) - DateTime.UtcNow).TotalHours + 1.0))}",
-                                ErrorDetails = new Dictionary<string, List<string>>()
-                            };
+                                fakeError = new PlayFabError
+                                {
+                                    Error = PlayFabErrorCode.UnknownError,
+                                    ErrorMessage = $"Your {(error.ErrorMessage.ToLower().Contains("this ip") ? "IP address" : "account")} has been banned. Hours left: {(int)((DateTime.Parse(enumerator.Current.Value[0]) - DateTime.UtcNow).TotalHours + 1.0)}",
+                                    ErrorDetails = new Dictionary<string, List<string>>()
+                                };
+                            } else
+                            {
+                                fakeError = new PlayFabError
+                                {
+                                    Error = PlayFabErrorCode.UnknownError,
+                                    ErrorMessage = $"Your {(error.ErrorMessage.ToLower().Contains("this ip") ? "IP address" : "account")} has been banned indefinitely.",
+                                    ErrorDetails = new Dictionary<string, List<string>>()
+                                };
+                            }
                             errorCallback?.Invoke(fakeError);
                             return;
                         }
