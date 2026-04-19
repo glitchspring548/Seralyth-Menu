@@ -4776,7 +4776,7 @@ namespace Seralyth.Mods
         {
             offsetDic[var] += positive ? 1 : -1;
 
-            foreach (var key in offsetDic.Keys.ToList())
+            foreach (int key in offsetDic.Keys.ToList())
             {
                 if (offsetDic[key] > 100) offsetDic[key] = -100;
                 else if (offsetDic[key] < -100) offsetDic[key] = 100;
