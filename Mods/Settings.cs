@@ -539,6 +539,13 @@ namespace Seralyth.Mods
                     toolTip = $"Copies the movement of {targetName}."
                 },
                 new ButtonInfo {
+                    buttonText = "Clone Movement",
+                    overlapText = $"Clone Movement {targetName}",
+                    method =() => Movement.CloneMovementPlayer(player),
+                    disableMethod = Movement.EnableRig,
+                    toolTip = $"Clones the movement of {targetName}."
+                },
+                new ButtonInfo {
                     buttonText = "Follow Player",
                     overlapText = $"Follow {targetName}",
                     method =() => Movement.FollowPlayer(player),

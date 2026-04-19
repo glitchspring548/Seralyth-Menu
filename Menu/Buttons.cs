@@ -354,7 +354,11 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Reverse Intercourse", toolTip = "Turns you into the receiver when using the intercourse gun."},
 
                 new ButtonInfo { buttonText = "Elevated Sticky Drive", toolTip = "Makes you float higher in the air whenever you use Sticky Drive."},
-                new ButtonInfo { buttonText = "High Quality Portals", toolTip = "Makes the view through the portals higher quality." }
+                new ButtonInfo { buttonText = "High Quality Portals", toolTip = "Makes the view through the portals higher quality." },
+
+                new ButtonInfo { buttonText = "Clone offset X", overlapText = "Clone offset X <color=grey>[</color><color=green>0</color><color=grey>]</color>", method =() => Movement.ChangeCloneOffset("X"), enableMethod =() => Movement.ChangeCloneOffset("X"), disableMethod =() => Movement.ChangeCloneOffset("X", false), incremental = true, isTogglable = false, toolTip = "Changes the offset X for the clone mods."},
+                new ButtonInfo { buttonText = "Clone offset Y", overlapText = "Clone offset Y <color=grey>[</color><color=green>0</color><color=grey>]</color>", method =() => Movement.ChangeCloneOffset("Y"), enableMethod =() => Movement.ChangeCloneOffset("Y"), disableMethod =() => Movement.ChangeCloneOffset("Y", false), incremental = true, isTogglable = false, toolTip = "Changes the offset Y for the clone mods."},
+                new ButtonInfo { buttonText = "Clone offset Z", overlapText = "Clone offset Z <color=grey>[</color><color=green>0</color><color=grey>]</color>", method =() => Movement.ChangeCloneOffset("Z"), enableMethod =() => Movement.ChangeCloneOffset("Z"), disableMethod =() => Movement.ChangeCloneOffset("Z", false), incremental = true, isTogglable = false, toolTip = "Changes the offset Z for the clone mods."}
             },
 
             new[] { // Projectile Settings [5]
@@ -796,6 +800,7 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Piggyback Gun", aliases = new[] { "Ride Gun" }, method = Movement.PiggybackGun, toolTip = "Teleports you on top of whoever your hand desires repeatedly."},
                 new ButtonInfo { buttonText = "Piggyback All", aliases = new[] { "Ride All" }, enableMethod = Movement.PiggybackAll, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Makes you appear on top of everyone in the room"},
 
+                new ButtonInfo { buttonText = "Clone Movement Gun", method = Movement.CloneMovementGun, toolTip = "Makes your rig clone the movement of whoever your hand desires."},
                 new ButtonInfo { buttonText = "Copy Movement Gun", method = Movement.CopyMovementGun, toolTip = "Makes your rig copy the movement of whoever your hand desires."},
                 new ButtonInfo { buttonText = "Copy Movement All", enableMethod = Movement.CopyMovementAll, disableMethod =() => { SerializePatch.OverrideSerialization = null; Movement.followPositions.Clear(); }, toolTip = "Makes your rig copy the movement of every player in the room."},
 

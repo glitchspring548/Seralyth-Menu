@@ -4724,7 +4724,6 @@ namespace Seralyth.Mods
 
             VRRig.LocalRig.head.rigTarget.transform.rotation = targetRig.head.rigTarget.transform.rotation;
         }
-
         public static void CopyMovementAll()
         {
             SerializePatch.OverrideSerialization = () =>
@@ -4765,6 +4764,93 @@ namespace Seralyth.Mods
 
                 return false;
             };
+        }
+        public static int xIndex = 0;
+        public static int yIndex = 0;
+        public static int zIndex = 0;
+        public static void ChangeCloneOffset(string var = "X", bool positive = true)
+        {
+            int interger = positive ? 1 : -1;
+
+            switch (var)
+            {
+                case "X": xIndex += interger; break;
+                case "Y": yIndex += interger; break;
+                case "Z": zIndex += interger; break;
+            }
+
+            if (xIndex > 100) xIndex = - 100;
+            else if (xIndex < -100) xIndex = 100;
+            if (yIndex > 100) yIndex = -100;
+            else if (yIndex < -100) yIndex = 100;
+            if (zIndex > 100) zIndex = -100;
+            else if (zIndex < -100) zIndex = 100;
+
+            Buttons.GetIndex("Clone offset " + var).overlapText = "Clone offset " + var + " <color=grey>[</color><color=green>" + (var == "X" ? xIndex / 10f : var == "Y" ? yIndex / 10f : zIndex / 10f) + "</color><color=grey>]</color>";
+        }
+        public static void CloneMovementGun()
+        {
+            if (GetGunInput(false))
+            {
+                var GunData = RenderGun();
+                RaycastHit Ray = GunData.Ray;
+
+                if (gunLocked && lockTarget != null)
+                    CloneMovementPlayer(GetPlayerFromVRRig(lockTarget));
+
+                if (GetGunInput(true))
+                {
+                    VRRig gunTarget = Ray.collider.GetComponentInParent<VRRig>();
+                    if (gunTarget && !gunTarget.IsLocal())
+                    {
+                        gunLocked = true;
+                        lockTarget = gunTarget;
+                    }
+                }
+            }
+            else
+            {
+                if (gunLocked)
+                {
+                    gunLocked = false;
+                    VRRig.LocalRig.enabled = true;
+                }
+            }
+        }
+        public static void CloneMovementPlayer(NetPlayer player, bool fingers = true)
+        {
+            VRRig targetRig = GetVRRigFromPlayer(player);
+            VRRig.LocalRig.enabled = false;
+
+            VRRig.LocalRig.transform.position = targetRig.syncPos + new Vector3(xIndex / 10f, yIndex / 10f, zIndex / 10f);
+            VRRig.LocalRig.transform.rotation = targetRig.syncRotation;
+
+            VRRig.LocalRig.leftHand.rigTarget.transform.position = targetRig.leftHand.rigTarget.transform.position + new Vector3(xIndex / 10f, yIndex / 10f, zIndex / 10f);
+            VRRig.LocalRig.rightHand.rigTarget.transform.position = targetRig.rightHand.rigTarget.transform.position + new Vector3(xIndex / 10f, yIndex / 10f, zIndex / 10f);
+
+            VRRig.LocalRig.leftHand.rigTarget.transform.rotation = targetRig.leftHand.rigTarget.transform.rotation;
+            VRRig.LocalRig.rightHand.rigTarget.transform.rotation = targetRig.rightHand.rigTarget.transform.rotation;
+
+            if (fingers)
+            {
+                VRRig.LocalRig.leftIndex.calcT = targetRig.leftIndex.calcT;
+                VRRig.LocalRig.leftMiddle.calcT = targetRig.leftMiddle.calcT;
+                VRRig.LocalRig.leftThumb.calcT = targetRig.leftThumb.calcT;
+
+                VRRig.LocalRig.leftIndex.LerpFinger(1f, false);
+                VRRig.LocalRig.leftMiddle.LerpFinger(1f, false);
+                VRRig.LocalRig.leftThumb.LerpFinger(1f, false);
+
+                VRRig.LocalRig.rightIndex.calcT = targetRig.rightIndex.calcT;
+                VRRig.LocalRig.rightMiddle.calcT = targetRig.rightMiddle.calcT;
+                VRRig.LocalRig.rightThumb.calcT = targetRig.rightThumb.calcT;
+
+                VRRig.LocalRig.rightIndex.LerpFinger(1f, false);
+                VRRig.LocalRig.rightMiddle.LerpFinger(1f, false);
+                VRRig.LocalRig.rightThumb.LerpFinger(1f, false);
+            }
+
+            VRRig.LocalRig.head.rigTarget.transform.rotation = targetRig.head.rigTarget.transform.rotation;
         }
 
         public static void FollowPlayer(NetPlayer player, bool fingers = true)
