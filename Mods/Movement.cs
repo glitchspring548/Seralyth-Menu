@@ -20,6 +20,7 @@
  */
 
 using ExitGames.Client.Photon;
+using ExitGames.Client.Photon.StructWrapping;
 using GorillaExtensions;
 using GorillaLocomotion;
 using GorillaLocomotion.Climbing;
@@ -4781,7 +4782,7 @@ namespace Seralyth.Mods
                 if (offsetDic[key] > 100) offsetDic[key] = -100;
                 else if (offsetDic[key] < -100) offsetDic[key] = 100;
             }
-            Buttons.GetIndex("Clone offset " + var).overlapText = "Clone offset " + var + " <color=grey>[</color><color=green>" + offsetDic[var] / 10 + "</color><color=grey>]</color>";
+            Buttons.GetIndex("Clone offset " + (var == 0 ? "X" : (var == 1 ? "Y" : "Z" ))).overlapText = "Clone offset " + (var == 0 ? "X" : (var == 1 ? "Y" : "Z" )) + " <color=grey>[</color><color=green>" + offsetDic[var] / 10f + "</color><color=grey>]</color>";
         }
         public static void CloneMovementGun()
         {
