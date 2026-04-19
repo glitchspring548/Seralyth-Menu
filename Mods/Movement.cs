@@ -4781,7 +4781,7 @@ namespace Seralyth.Mods
                 if (offsetDic[key] > 100) offsetDic[key] = -100;
                 else if (offsetDic[key] < -100) offsetDic[key] = 100;
             }
-            Buttons.GetIndex("Clone offset " + var).overlapText = "Clone offset " + var + " <color=grey>[</color><color=green>" + (var == "X" ? xIndex / 10f : var == "Y" ? yIndex / 10f : zIndex / 10f) + "</color><color=grey>]</color>";
+            Buttons.GetIndex("Clone offset " + var).overlapText = "Clone offset " + var + " <color=grey>[</color><color=green>" + offsetDic[var] / 10 + "</color><color=grey>]</color>";
         }
         public static void CloneMovementGun()
         {
