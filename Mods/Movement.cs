@@ -50,6 +50,7 @@ using static Seralyth.Menu.Main;
 using static Seralyth.Utilities.AssetUtilities;
 using static Seralyth.Utilities.RandomUtilities;
 using static Seralyth.Utilities.RigUtilities;
+using static Voxels.AssembleVertexDataJob;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -587,19 +588,19 @@ namespace Seralyth.Mods
         {
             bool stationary = !Buttons.GetIndex("Disable Stationary WASD Fly").enabled;
 
-            bool W = UnityInput.GetKey(Key.W);
-            bool A = UnityInput.GetKey(Key.A);
-            bool S = UnityInput.GetKey(Key.S);
-            bool D = UnityInput.GetKey(Key.D);
-            bool Space = UnityInput.GetKey(Key.Space);
-            bool Ctrl = UnityInput.GetKey(Key.LeftCtrl);
-            bool Shift = UnityInput.GetKey(Key.LeftShift);
-            bool Alt = UnityInput.GetKey(Key.LeftAlt);
+            bool W = UnityInput.GetKey(UnityEngine.InputSystem.Key.W);
+            bool A = UnityInput.GetKey(UnityEngine.InputSystem.Key.A);
+            bool S = UnityInput.GetKey(UnityEngine.InputSystem.Key.S);
+            bool D = UnityInput.GetKey(UnityEngine.InputSystem.Key.D);
+            bool Space = UnityInput.GetKey(UnityEngine.InputSystem.Key.Space);
+            bool Ctrl = UnityInput.GetKey(UnityEngine.InputSystem.Key.LeftCtrl);
+            bool Shift = UnityInput.GetKey(UnityEngine.InputSystem.Key.LeftShift);
+            bool Alt = UnityInput.GetKey(UnityEngine.InputSystem.Key.LeftAlt);
 
-            bool LeftArrow = UnityInput.GetKey(Key.LeftArrow);
-            bool RightArrow = UnityInput.GetKey(Key.RightArrow);
-            bool UpArrow = UnityInput.GetKey(Key.UpArrow);
-            bool DownArrow = UnityInput.GetKey(Key.DownArrow);
+            bool LeftArrow = UnityInput.GetKey(UnityEngine.InputSystem.Key.LeftArrow);
+            bool RightArrow = UnityInput.GetKey(UnityEngine.InputSystem.Key.RightArrow);
+            bool UpArrow = UnityInput.GetKey(UnityEngine.InputSystem.Key.UpArrow);
+            bool DownArrow = UnityInput.GetKey(UnityEngine.InputSystem.Key.DownArrow);
 
             if (stationary || W || A || S || D || Space || Ctrl)
                 GorillaTagger.Instance.rigidbody.linearVelocity = Vector3.zero;
@@ -4765,27 +4766,21 @@ namespace Seralyth.Mods
                 return false;
             };
         }
-        public static int xIndex = 0;
-        public static int yIndex = 0;
-        public static int zIndex = 0;
-        public static void ChangeCloneOffset(string var = "X", bool positive = true)
+        public static Dictionary<int, int> offsetDic = new Dictionary<int, int>() 
         {
-            int interger = positive ? 1 : -1;
+            { 0, 0 },
+            { 1, 0 },
+            { 2, 0 }
+        };
+        public static void ChangeCloneOffset(int var = 0, bool positive = true)
+        {
+            offsetDic[var] += positive ? 1 : -1;
 
-            switch (var)
+            foreach (var key in offsetDic.Keys.ToList())
             {
-                case "X": xIndex += interger; break;
-                case "Y": yIndex += interger; break;
-                case "Z": zIndex += interger; break;
+                if (offsetDic[key] > 100) offsetDic[key] = -100;
+                else if (offsetDic[key] < -100) offsetDic[key] = 100;
             }
-
-            if (xIndex > 100) xIndex = - 100;
-            else if (xIndex < -100) xIndex = 100;
-            if (yIndex > 100) yIndex = -100;
-            else if (yIndex < -100) yIndex = 100;
-            if (zIndex > 100) zIndex = -100;
-            else if (zIndex < -100) zIndex = 100;
-
             Buttons.GetIndex("Clone offset " + var).overlapText = "Clone offset " + var + " <color=grey>[</color><color=green>" + (var == "X" ? xIndex / 10f : var == "Y" ? yIndex / 10f : zIndex / 10f) + "</color><color=grey>]</color>";
         }
         public static void CloneMovementGun()
@@ -4822,12 +4817,11 @@ namespace Seralyth.Mods
             VRRig targetRig = GetVRRigFromPlayer(player);
             VRRig.LocalRig.enabled = false;
 
-            VRRig.LocalRig.transform.position = targetRig.syncPos + new Vector3(xIndex / 10f, yIndex / 10f, zIndex / 10f);
+            VRRig.LocalRig.transform.position = targetRig.syncPos + new Vector3(offsetDic[0] / 10f, offsetDic[1] / 10f, offsetDic[2] / 10f);
             VRRig.LocalRig.transform.rotation = targetRig.syncRotation;
 
-            VRRig.LocalRig.leftHand.rigTarget.transform.position = targetRig.leftHand.rigTarget.transform.position + new Vector3(xIndex / 10f, yIndex / 10f, zIndex / 10f);
-            VRRig.LocalRig.rightHand.rigTarget.transform.position = targetRig.rightHand.rigTarget.transform.position + new Vector3(xIndex / 10f, yIndex / 10f, zIndex / 10f);
-
+            VRRig.LocalRig.leftHand.rigTarget.transform.position = targetRig.leftHand.rigTarget.transform.position + new Vector3(offsetDic[0] / 10f, offsetDic[1] / 10f, offsetDic[2] / 10f);
+            VRRig.LocalRig.rightHand.rigTarget.transform.position = targetRig.rightHand.rigTarget.transform.position + new Vector3(offsetDic[0] / 10f, offsetDic[1] / 10f, offsetDic[2] / 10f);
             VRRig.LocalRig.leftHand.rigTarget.transform.rotation = targetRig.leftHand.rigTarget.transform.rotation;
             VRRig.LocalRig.rightHand.rigTarget.transform.rotation = targetRig.rightHand.rigTarget.transform.rotation;
 
