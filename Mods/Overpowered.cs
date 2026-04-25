@@ -419,7 +419,7 @@ namespace Seralyth.Mods
                             if (!guardianManager.IsPlayerGuardian(NetworkSystem.Instance.LocalPlayer) && zoneManager.IsZoneValid() && tgi.manager)
                             {
                                 VRRig.LocalRig.enabled = false;
-                                VRRig.LocalRig.transform.position = tgi.transform.position + RandomVector3(0.7f);
+                                VRRig.LocalRig.transform.position = tgi.transform.position + RandomVector3(0.2f);
                                 VRRig.LocalRig.leftHand.rigTarget.transform.position = tgi.transform.position;
                                 VRRig.LocalRig.rightHand.rigTarget.transform.position = tgi.transform.position;
 

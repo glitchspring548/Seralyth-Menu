@@ -800,6 +800,7 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Piggyback Gun", aliases = new[] { "Ride Gun" }, method = Movement.PiggybackGun, toolTip = "Teleports you on top of whoever your hand desires repeatedly."},
                 new ButtonInfo { buttonText = "Piggyback All", aliases = new[] { "Ride All" }, enableMethod = Movement.PiggybackAll, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Makes you appear on top of everyone in the room"},
 
+                                new ButtonInfo { buttonText = "Weeping Angel", enableMethod =() => Movement.WeepingAngelEnable(), method =() => Movement.WeepingAngel(), disableMethod =() => Movement.WeepingAngelDisable(), toolTip = "Makes your rig not move when someone is looking."},
                 new ButtonInfo { buttonText = "Clone Movement Gun", method = Movement.CloneMovementGun, toolTip = "Makes your rig clone the movement of whoever your hand desires."},
                 new ButtonInfo { buttonText = "Copy Movement Gun", method = Movement.CopyMovementGun, toolTip = "Makes your rig copy the movement of whoever your hand desires."},
                 new ButtonInfo { buttonText = "Copy Movement All", enableMethod = Movement.CopyMovementAll, disableMethod =() => { SerializePatch.OverrideSerialization = null; Movement.followPositions.Clear(); }, toolTip = "Makes your rig copy the movement of every player in the room."},

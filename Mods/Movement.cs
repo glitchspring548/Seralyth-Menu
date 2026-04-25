@@ -25,6 +25,7 @@ using GorillaExtensions;
 using GorillaLocomotion;
 using GorillaLocomotion.Climbing;
 using GorillaLocomotion.Swimming;
+using Harmony;
 using Photon.Pun;
 using Photon.Realtime;
 using Seralyth.Classes.Menu;
@@ -42,9 +43,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using TMPro;
+using Unity.XR.CoreUtils;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 using UnityEngine.XR;
 using Valve.Newtonsoft.Json.Linq;
 using static Seralyth.Menu.Main;
@@ -6256,6 +6260,112 @@ namespace Seralyth.Mods
                     headspazDelay = Time.time + Random.Range(200f, 1000f) / 1000f;
                 }
             }
+        }
+        public static readonly string[] WeepingAngelLayers =
+        {
+            "Gorilla Trigger",
+            "Gorilla Body",
+            "Gorilla Boundary",
+            "GorillaHand",
+            "Zone",
+            "Water",
+            "GorillaCosmetics",
+            "GorillaParticle",
+            "Gorilla Tag Collider",
+            "GorillaInteractable"
+        };
+        public static GameObject currentPlayer;
+        public static List<GameObject> weepingOthers = new List<GameObject>();
+        public static void WeepingAngelEnable() 
+        {
+            if (currentPlayer != null)
+            {
+                currentPlayer.Destroy();
+                currentPlayer = null;
+            }
+            currentPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            currentPlayer.name = "WeepingAngel";
+            currentPlayer.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            currentPlayer.GetComponent<Renderer>().Destroy();
+            currentPlayer.GetComponent<BoxCollider>().isTrigger = true;
+
+            foreach (Player plr in PhotonNetwork.PlayerListOthers)
+            {
+                GameObject obj = new GameObject();
+                obj.name = "WeepingAngelOther";
+                obj.transform.SetParent(plr.VRRig().headMesh.transform, false);
+                obj.transform.localPosition = new Vector3(0f, 0.25f, 0.25f);
+                weepingOthers.Add(obj);
+            }
+        }
+        public static void WeepingAngel()
+        {
+            if (!PhotonNetwork.InRoom) return;
+            if (currentPlayer == null)
+            {
+                currentPlayer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                currentPlayer.name = "WeepingAngel";
+                currentPlayer.GetComponent<Renderer>().Destroy();
+                currentPlayer.GetComponent<BoxCollider>().isTrigger = true;
+            }
+            currentPlayer.transform.position = GTPlayer._instance.bodyCollider.gameObject.transform.position + new Vector3(0f, 0.05f, 0f);
+            foreach (Player plr in PhotonNetwork.PlayerListOthers)
+            {
+                if (plr.VRRig().headMesh.GetNamedChild("WeepingAngelOther") == null) 
+                {
+                    GameObject obj = new GameObject();
+                    obj.name = "WeepingAngelOther";
+                    obj.transform.SetParent(plr.VRRig().headMesh.transform, false);
+                    obj.transform.localPosition = new Vector3(0f, 0.25f, 0.25f);
+                    weepingOthers.Add(obj);
+                }
+            }
+            int uhhAmountThingy = 0;
+            foreach (GameObject plr in weepingOthers)
+            {
+                if (plr == null)
+                    continue;
+                plr.transform.LookAt(currentPlayer.transform.position);
+                Physics.Raycast(plr.transform.position, plr.transform.forward, out RaycastHit hit, float.PositiveInfinity, ~LayerMask.GetMask(WeepingAngelLayers));
+                if (hit.collider != null)
+                {
+                    if (hit.collider.gameObject == currentPlayer)
+                    {
+                        uhhAmountThingy++;
+                    }
+                }
+            }
+            if (uhhAmountThingy == 0)
+            {
+                if (!VRRig.LocalRig.enabled) 
+                {
+                    VRRig.LocalRig.enabled = true;
+                }
+            }
+            else 
+            {
+                if (VRRig.LocalRig.enabled)
+                {
+                    VRRig.LocalRig.enabled = false;
+                }
+            }
+        }
+        public static void WeepingAngelDisable()
+        {
+            foreach(GameObject plr in weepingOthers)
+            {
+                if (plr != null) 
+                {
+                    plr.Destroy();
+                }
+            }
+            weepingOthers.Clear();
+            if (currentPlayer != null)
+            {
+                currentPlayer.Destroy();
+                currentPlayer = null;
+            }
+            VRRig.LocalRig.enabled = true;
         }
 
         private static Vector3 headoffs = Vector3.zero;
