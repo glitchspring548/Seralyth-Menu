@@ -6294,7 +6294,7 @@ namespace Seralyth.Mods
                 GameObject obj = new GameObject();
                 obj.name = "WeepingAngelOther";
                 obj.transform.SetParent(plr.VRRig().headMesh.transform, false);
-                obj.transform.localPosition = new Vector3(0f, 0.25f, 0.25f);
+                obj.transform.localPosition = new Vector3(0f, 0.75f, 0.25f);
                 weepingOthers.Add(obj);
             }
         }
@@ -6316,7 +6316,7 @@ namespace Seralyth.Mods
                     GameObject obj = new GameObject();
                     obj.name = "WeepingAngelOther";
                     obj.transform.SetParent(plr.VRRig().headMesh.transform, false);
-                    obj.transform.localPosition = new Vector3(0f, 0.25f, 0.25f);
+                    obj.transform.localPosition = new Vector3(0f, 0.75f, 0.25f);
                     weepingOthers.Add(obj);
                 }
             }
